@@ -26,7 +26,7 @@ import com.google.cloud.tools.appengine.cloudsdk.AppEngineJavaComponentsNotInsta
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.eclipse.util.status.StatusUtil;
 
-public abstract class FacetInstallDelegate implements IDelegate   {
+public abstract class AppEngineFacetInstallDelegate implements IDelegate   {
   @Override
   public void execute(IProject project,
       IProjectFacetVersion version,
@@ -42,7 +42,7 @@ public abstract class FacetInstallDelegate implements IDelegate   {
     } catch (AppEngineJavaComponentsNotInstalledException ex) {
       // to properly display error in message box
       throw new CoreException(StatusUtil.error(getClass(),
-          Messages.getString("appengine.component.missing"), ex));
+          Messages.getString("appengine.java.component.missing"), ex));
     }
   }
 }

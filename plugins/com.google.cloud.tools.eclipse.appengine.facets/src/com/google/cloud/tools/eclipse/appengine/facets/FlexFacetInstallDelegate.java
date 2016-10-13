@@ -21,7 +21,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
 
-public class FlexFacetInstallDelegate extends FacetInstallDelegate {
+public class FlexFacetInstallDelegate extends AppEngineFacetInstallDelegate {
 
   @Override
   public void execute(IProject project, IProjectFacetVersion facetVersion, Object config, IProgressMonitor monitor)

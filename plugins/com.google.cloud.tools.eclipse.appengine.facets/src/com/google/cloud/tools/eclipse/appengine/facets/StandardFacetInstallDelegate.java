@@ -30,7 +30,7 @@ import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
 import java.io.ByteArrayInputStream;
 import java.util.Collections;
 
-public class StandardFacetInstallDelegate extends FacetInstallDelegate {
+public class StandardFacetInstallDelegate extends AppEngineFacetInstallDelegate {
   private final static String APPENGINE_WEB_XML = "appengine-web.xml";
   // TODO Change directory for dynamic web module.
   // Differentiate between project with web facets vs 'true' dynamic web modules?
