@@ -16,18 +16,22 @@
 
 package com.google.cloud.tools.eclipse.appengine.facets;
 
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.wst.common.project.facet.core.IDelegate;
-import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 
-public class FlexFacetUninstallDelegate implements IDelegate {
+public class Messages {
+  private static final String BUNDLE_NAME = "com.google.cloud.tools.eclipse.appengine.facets.messages"; //$NON-NLS-1$
 
-  @Override
-  public void execute(IProject project, IProjectFacetVersion facetVersion, Object config, IProgressMonitor monitor)
-      throws CoreException {
-    
+  private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
+
+  private Messages() {
   }
 
+  public static String getString(String key) {
+    try {
+      return RESOURCE_BUNDLE.getString(key);
+    } catch (MissingResourceException e) {
+      return '!' + key + '!';
+    }
+  }
 }
