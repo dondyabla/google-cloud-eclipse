@@ -16,17 +16,6 @@
 
 package com.google.cloud.tools.eclipse.appengine.facets;
 
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
-
 public class FlexFacetInstallDelegate extends AppEngineFacetInstallDelegate {
-
-  @Override
-  public void execute(IProject project, IProjectFacetVersion facetVersion, Object config, IProgressMonitor monitor)
-      throws CoreException {
-    super.execute(project, facetVersion, config, monitor);
-  }
 
 }
