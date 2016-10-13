@@ -118,7 +118,7 @@ public class DeployPropertyPage extends PropertyPage {
     if (AppEngineStandardFacet.hasAppEngineFacet(facetedProject)) {
       setTitle(Messages.getString("standard.page.title"));
       return new StandardDeployPreferencesPanel(
-          container, project, loginService, getLayoutChangedHandler());
+          container, project, loginService, getLayoutChangedHandler(), false /* requireValues */);
     } else if (AppEngineFlexFacet.hasAppEngineFacet(facetedProject)) {
       setTitle(Messages.getString("flex.page.title"));
       return new FlexDeployPreferencesPanel(container);

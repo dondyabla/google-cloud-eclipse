@@ -14,24 +14,21 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.eclipse.appengine.newproject.maven;
+package com.google.cloud.tools.eclipse.preferences;
 
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ProjectScope;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
-public class Messages {
-  private static final String BUNDLE_NAME = "com.google.cloud.tools.eclipse.appengine.newproject.maven.messages"; //$NON-NLS-1$
+public class PreferenceUtil {
 
-  private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
+  private static final String DEPLOY = "com.google.cloud.tools.eclipse.appengine.deploy";
 
-  private Messages() {
-  }
-
-  public static String getString(String key) {
-    try {
-      return RESOURCE_BUNDLE.getString(key);
-    } catch (MissingResourceException ex) {
-      return '!' + key + '!';
+  public static void setProjectIdPreference(IProject project, String projectId) {
+    if (projectId != null && !projectId.isEmpty()) {
+      IEclipsePreferences preferences = new ProjectScope(project).getNode(DEPLOY);
+      preferences.put("project.id", projectId);
     }
   }
+
 }
