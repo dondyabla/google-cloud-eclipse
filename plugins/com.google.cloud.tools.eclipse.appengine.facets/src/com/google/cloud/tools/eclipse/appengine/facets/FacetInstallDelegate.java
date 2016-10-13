@@ -32,13 +32,13 @@ public abstract class FacetInstallDelegate implements IDelegate   {
       IProjectFacetVersion version,
       Object config,
       IProgressMonitor monitor) throws CoreException {
-    verifyGcloudAppEngineComponent();
+    validateAppEngineComponent();
   }
 
-  private void verifyGcloudAppEngineComponent() throws CoreException {
+  private void validateAppEngineComponent() throws CoreException {
     CloudSdk cloudSdk = new CloudSdk.Builder().build();
     try {
-    cloudSdk.validateAppEngineJavaComponents();
+      cloudSdk.validateAppEngineJavaComponents();
     } catch (AppEngineJavaComponentsNotInstalledException ex) {
       // to properly display error in message box
       throw new CoreException(StatusUtil.error(getClass(),
