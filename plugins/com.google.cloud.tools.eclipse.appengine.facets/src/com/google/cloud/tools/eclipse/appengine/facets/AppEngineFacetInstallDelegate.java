@@ -32,10 +32,10 @@ public abstract class AppEngineFacetInstallDelegate implements IDelegate   {
       IProjectFacetVersion version,
       Object config,
       IProgressMonitor monitor) throws CoreException {
-    validateAppEngineComponent();
+    validateAppEngineJavaComponents();
   }
 
-  private void validateAppEngineComponent() throws CoreException {
+  private void validateAppEngineJavaComponents() throws CoreException {
     CloudSdk cloudSdk = new CloudSdk.Builder().build();
     try {
       cloudSdk.validateAppEngineJavaComponents();
