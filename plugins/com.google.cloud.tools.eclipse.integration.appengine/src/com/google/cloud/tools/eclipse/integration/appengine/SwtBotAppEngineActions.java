@@ -222,8 +222,12 @@ public class SwtBotAppEngineActions {
 
       @Override
       public boolean test() throws Exception {
-        SWTBotShell shell = bot.shell("Properties for " + projectName);
-        shell.activate();
+        try {
+          SWTBotShell shell = bot.shell("Properties for " + projectName);
+          shell.activate();
+        } catch (WidgetNotFoundException ex) {
+          return false;
+        }
         return true;
       }
 
