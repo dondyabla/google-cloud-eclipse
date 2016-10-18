@@ -20,6 +20,8 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StyleRange;
+import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
@@ -51,12 +53,24 @@ public class AppEngineComponentPage extends WizardPage {
     Composite container = new Composite(parent, SWT.NONE);
     GridLayoutFactory.swtDefaults().numColumns(1).applyTo(container);
 
-    Text text = new Text(container, SWT.MULTI | SWT.READ_ONLY | SWT.WRAP);
     GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
     gridData.widthHint = parent.getSize().x;
-    text.setLayoutData(gridData);
-    text.setText(Messages.getString("appengine.java.component.missing"));
-    text.setBackground(container.getBackground());
+
+    String message = Messages.getString("appengine.java.component.missing");
+    StyledText styledText = new StyledText(container, SWT.MULTI | SWT.READ_ONLY | SWT.WRAP);
+    styledText.setLayoutData(gridData);
+    styledText.setText(message);
+    styledText.setBackground(container.getBackground());
+
+    int startIndex = message.indexOf("\'");
+    int endIndex = message.indexOf("\'", startIndex + 1);
+    if ((-1 < startIndex) && (startIndex < endIndex)) {
+      StyleRange styleRange = new StyleRange();
+      styleRange.start = startIndex + 1;
+      styleRange.length = endIndex - startIndex;
+      styleRange.fontStyle = SWT.BOLD;
+      styledText.setStyleRange(styleRange);
+    }
 
     setControl(container);
     setPageComplete(false);
