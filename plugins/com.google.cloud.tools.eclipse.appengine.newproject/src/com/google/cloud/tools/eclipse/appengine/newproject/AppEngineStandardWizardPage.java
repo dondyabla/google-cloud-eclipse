@@ -1,3 +1,19 @@
+/*
+ * Copyright 2016 Google Inc. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.google.cloud.tools.eclipse.appengine.newproject;
 
 import java.io.File;
@@ -85,7 +101,7 @@ public class AppEngineStandardWizardPage extends WizardNewProjectCreationPage {
 
   private void addManageLibrariesWidgets(Composite container) {
     apiGroup = new Group(container, SWT.NONE);
-    apiGroup.setText(Messages.AppEngineStandardWizardPage_librariesGroupLabel);
+    apiGroup.setText(Messages.getString("appengine.standard.wizard.page.libraries.group.label"));
     GridDataFactory.fillDefaults().span(2, 1).applyTo(apiGroup);
 
     for (Library library : getLibraries()) {
