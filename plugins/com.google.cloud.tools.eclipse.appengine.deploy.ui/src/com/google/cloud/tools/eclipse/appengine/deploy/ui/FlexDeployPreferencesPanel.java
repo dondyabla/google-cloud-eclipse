@@ -29,7 +29,6 @@ import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-// TODO: persist values
 public class FlexDeployPreferencesPanel extends DeployPreferencesPanel {
   private static final int LINKED_CHILD_INDENT = 10;
   private Button useValuesButton;
@@ -52,7 +51,7 @@ public class FlexDeployPreferencesPanel extends DeployPreferencesPanel {
 
   @Override
   public void resetToDefaults() {
-
+    // TODO update this
   }
 
   @Override
