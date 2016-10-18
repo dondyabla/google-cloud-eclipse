@@ -217,25 +217,6 @@ public class SwtBotAppEngineActions {
   public static void openProjectProperties(final SWTWorkbenchBot bot, final String projectName) {
     SWTBotTreeItem projectTreeItem = selectProjectInPackageExplorer(bot, projectName);
     projectTreeItem.contextMenu("Properties").click();
-
-    bot.waitUntilWidgetAppears(new DefaultCondition() {
-
-      @Override
-      public boolean test() throws Exception {
-        try {
-          SWTBotShell shell = bot.shell("Properties for " + projectName);
-          shell.activate();
-        } catch (WidgetNotFoundException ex) {
-          return false;
-        }
-        return true;
-      }
-
-      @Override
-      public String getFailureMessage() {
-        return "Cannot find the Property Dialog";
-      }
-
-    });
+    bot.activeShell();
   }
 }
