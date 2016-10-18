@@ -39,7 +39,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 
 import com.google.cloud.tools.eclipse.appengine.libraries.config.LibraryFactory;
-import com.google.cloud.tools.eclipse.appengine.libraries.config.LibraryFactory.LibraryFactoryException;
+import com.google.cloud.tools.eclipse.appengine.libraries.config.LibraryFactoryException;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AppEngineLibraryContainerInitializerTest {

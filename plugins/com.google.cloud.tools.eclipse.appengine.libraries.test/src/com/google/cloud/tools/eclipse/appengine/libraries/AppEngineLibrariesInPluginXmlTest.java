@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
+
 package com.google.cloud.tools.eclipse.appengine.libraries;
 
 import static org.hamcrest.Matchers.is;
@@ -28,11 +29,12 @@ import java.net.URISyntaxException;
 import java.util.List;
 
 import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.RegistryFactory;
 import org.junit.Test;
 
 import com.google.cloud.tools.eclipse.appengine.libraries.config.LibraryFactory;
-import com.google.cloud.tools.eclipse.appengine.libraries.config.LibraryFactory.LibraryFactoryException;
+import com.google.cloud.tools.eclipse.appengine.libraries.config.LibraryFactoryException;
 
 /**
  * This class is intended to test the App Engine libraries set in the plugin.xml to validate that their attributes
@@ -54,39 +56,40 @@ public class AppEngineLibrariesInPluginXmlTest {
 
   @Test
   public void testAppEngineApiLibraryConfig() throws URISyntaxException, LibraryFactoryException {
-        Library appEngineLibrary = getLibraryWithId(APP_ENGINE_API_LIBRARY_ID);
-        assertThat(appEngineLibrary.getContainerPath().toString(),
-                   is(Library.CONTAINER_PATH_PREFIX + "/" + APP_ENGINE_API_LIBRARY_ID));
-        assertThat(appEngineLibrary.getId(), is(APP_ENGINE_API_LIBRARY_ID));
-        assertThat(appEngineLibrary.getName(), is("App Engine API"));
-        assertThat(appEngineLibrary.getSiteUri(), is(new URI("https://cloud.google.com/appengine/docs/java/")));
+    Library appEngineLibrary = getLibraryWithId(APP_ENGINE_API_LIBRARY_ID);
+    assertThat(appEngineLibrary.getContainerPath().toString(),
+               is(Library.CONTAINER_PATH_PREFIX + "/" + APP_ENGINE_API_LIBRARY_ID));
+    assertThat(appEngineLibrary.getId(), is(APP_ENGINE_API_LIBRARY_ID));
+    assertThat(appEngineLibrary.getName(), is("App Engine API"));
+    assertThat(appEngineLibrary.getSiteUri(), is(new URI("https://cloud.google.com/appengine/docs/java/")));
+    assertTrue(appEngineLibrary.isExport());
 
-        assertThat(appEngineLibrary.getLibraryFiles().size(), is(1));
-        LibraryFile libraryFile = appEngineLibrary.getLibraryFiles().get(0);
-        assertThat(libraryFile.getJavadocUri(), is(new URI("https://cloud.google.com/appengine/docs/java/javadoc/")));
-        assertNull(libraryFile.getSourceUri());
-        assertTrue(libraryFile.isExport());
+    assertThat(appEngineLibrary.getLibraryFiles().size(), is(1));
+    LibraryFile libraryFile = appEngineLibrary.getLibraryFiles().get(0);
+    assertThat(libraryFile.getJavadocUri(), is(new URI("https://cloud.google.com/appengine/docs/java/javadoc/")));
+    assertNull(libraryFile.getSourceUri());
+    assertTrue("App Engine API not exported", libraryFile.isExport());
 
-        assertNotNull(libraryFile.getMavenCoordinates());
-        MavenCoordinates mavenCoordinates = libraryFile.getMavenCoordinates();
-        assertThat(mavenCoordinates.getRepository(), is("central"));
-        assertThat(mavenCoordinates.getGroupId(), is("com.google.appengine"));
-        assertThat(mavenCoordinates.getArtifactId(), is("appengine-api-1.0-sdk"));
-        assertThat(mavenCoordinates.getVersion(), is("LATEST"));
-        assertThat(mavenCoordinates.getType(), is("jar"));
-        assertNull(mavenCoordinates.getClassifier());
+    assertNotNull(libraryFile.getMavenCoordinates());
+    MavenCoordinates mavenCoordinates = libraryFile.getMavenCoordinates();
+    assertThat(mavenCoordinates.getRepository(), is("central"));
+    assertThat(mavenCoordinates.getGroupId(), is("com.google.appengine"));
+    assertThat(mavenCoordinates.getArtifactId(), is("appengine-api-1.0-sdk"));
+    assertThat(mavenCoordinates.getVersion(), is("LATEST"));
+    assertThat(mavenCoordinates.getType(), is("jar"));
+    assertNull(mavenCoordinates.getClassifier());
 
-        assertNotNull(libraryFile.getFilters());
-        List<Filter> filters = libraryFile.getFilters();
-        assertThat(filters.size(), is(4));
-        assertTrue(filters.get(0).isExclude());
-        assertThat(filters.get(0).getPattern(), is("com/google/appengine/repackaged/**"));
-        assertTrue(filters.get(1).isExclude());
-        assertThat(filters.get(1).getPattern(), is("com/google/appengine/labs/repackaged/**"));
-        assertFalse(filters.get(2).isExclude());
-        assertThat(filters.get(2).getPattern(), is("com/google/apphosting/api/**"));
-        assertTrue(filters.get(3).isExclude());
-        assertThat(filters.get(3).getPattern(), is("com/google/apphosting/**"));
+    assertNotNull(libraryFile.getFilters());
+    List<Filter> filters = libraryFile.getFilters();
+    assertThat(filters.size(), is(4));
+    assertTrue(filters.get(0).isExclude());
+    assertThat(filters.get(0).getPattern(), is("com/google/appengine/repackaged/**"));
+    assertTrue(filters.get(1).isExclude());
+    assertThat(filters.get(1).getPattern(), is("com/google/appengine/labs/repackaged/**"));
+    assertFalse(filters.get(2).isExclude());
+    assertThat(filters.get(2).getPattern(), is("com/google/apphosting/api/**"));
+    assertTrue(filters.get(3).isExclude());
+    assertThat(filters.get(3).getPattern(), is("com/google/apphosting/**"));
   }
 
   @Test
@@ -97,12 +100,16 @@ public class AppEngineLibrariesInPluginXmlTest {
     assertThat(endpointsLibrary.getId(), is(APP_ENGINE_ENDPOINTS_LIBRARY_ID));
     assertThat(endpointsLibrary.getName(), is("App Engine Endpoints"));
     assertThat(endpointsLibrary.getSiteUri(), is(new URI("https://cloud.google.com/appengine/docs/java/endpoints/")));
+    assertTrue(endpointsLibrary.isExport());
+    assertNotNull(endpointsLibrary.getLibraryDependencies());
+    assertThat(endpointsLibrary.getLibraryDependencies().size(), is(1));
+    assertThat(endpointsLibrary.getLibraryDependencies().get(0), is("appengine-api"));
 
     assertThat(endpointsLibrary.getLibraryFiles().size(), is(1));
     LibraryFile libraryFile = endpointsLibrary.getLibraryFiles().get(0);
     assertThat(libraryFile.getJavadocUri(), is(new URI("https://cloud.google.com/appengine/docs/java/endpoints/javadoc/")));
     assertNull(libraryFile.getSourceUri());
-    assertTrue(libraryFile.isExport());
+    assertTrue("Endpoints library not exported", libraryFile.isExport());
 
     assertNotNull(libraryFile.getMavenCoordinates());
     MavenCoordinates mavenCoordinates = libraryFile.getMavenCoordinates();
@@ -128,12 +135,13 @@ public class AppEngineLibrariesInPluginXmlTest {
     assertThat(objectifyLibrary.getId(), is(OBJECTIFY_LIBRARY_ID));
     assertThat(objectifyLibrary.getName(), is("Objectify"));
     assertThat(objectifyLibrary.getSiteUri(), is(new URI("https://github.com/objectify/objectify/wiki")));
+    assertTrue(objectifyLibrary.isExport());
 
     assertThat(objectifyLibrary.getLibraryFiles().size(), is(1));
     LibraryFile libraryFile = objectifyLibrary.getLibraryFiles().get(0);
     assertThat(libraryFile.getJavadocUri(), is(new URI("http://www.javadoc.io/doc/com.googlecode.objectify/objectify/")));
     assertNull(libraryFile.getSourceUri());
-    assertTrue(libraryFile.isExport());
+    assertTrue("Objectify not exported", libraryFile.isExport());
 
     assertNotNull(libraryFile.getMavenCoordinates());
     MavenCoordinates mavenCoordinates = libraryFile.getMavenCoordinates();
@@ -148,9 +156,9 @@ public class AppEngineLibrariesInPluginXmlTest {
     assertTrue(libraryFile.getFilters().isEmpty());
   }
 
-  private Library getLibraryWithId(String libraryId) throws LibraryFactoryException {
-    IConfigurationElement[] configurationElements =
-        RegistryFactory.getRegistry()
+  private static Library getLibraryWithId(String libraryId) throws LibraryFactoryException {
+    IExtensionRegistry registry = RegistryFactory.getRegistry();
+    IConfigurationElement[] configurationElements = registry
           .getConfigurationElementsFor(AppEngineLibraryContainerInitializer.LIBRARIES_EXTENSION_POINT);
     for (IConfigurationElement configurationElement : configurationElements) {
       if (configurationElement.getAttribute("id").equals(libraryId)) {

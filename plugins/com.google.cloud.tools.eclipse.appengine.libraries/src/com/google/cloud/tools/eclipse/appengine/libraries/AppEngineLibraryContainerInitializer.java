@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
+
 package com.google.cloud.tools.eclipse.appengine.libraries;
 
 import java.text.MessageFormat;
@@ -31,7 +32,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 
 import com.google.cloud.tools.eclipse.appengine.libraries.config.LibraryFactory;
-import com.google.cloud.tools.eclipse.appengine.libraries.config.LibraryFactory.LibraryFactoryException;
+import com.google.cloud.tools.eclipse.appengine.libraries.config.LibraryFactoryException;
 import com.google.cloud.tools.eclipse.util.status.StatusUtil;
 import com.google.common.annotations.VisibleForTesting;
 
