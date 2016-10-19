@@ -61,51 +61,46 @@ public class StandardProjectWizard extends Wizard implements INewWizard {
 
   @Override
   public boolean performFinish() {
-    if (hasAppEngineComponent) {
-      AnalyticsPingManager.getInstance().sendPing(
-          AnalyticsEvents.APP_ENGINE_NEW_PROJECT_WIZARD_COMPLETE,
-          AnalyticsEvents.APP_ENGINE_NEW_PROJECT_WIZARD_TYPE,
-          AnalyticsEvents.APP_ENGINE_NEW_PROJECT_WIZARD_TYPE_NATIVE);
+    AnalyticsPingManager.getInstance().sendPing(
+        AnalyticsEvents.APP_ENGINE_NEW_PROJECT_WIZARD_COMPLETE,
+        AnalyticsEvents.APP_ENGINE_NEW_PROJECT_WIZARD_TYPE,
+        AnalyticsEvents.APP_ENGINE_NEW_PROJECT_WIZARD_TYPE_NATIVE);
 
-      if (config.getCloudSdkLocation() == null) {
-        File location = CloudSdkPrompter.getCloudSdkLocation(getShell());
-        if (location == null) {
-          return false;
-        }
-        config.setCloudSdkLocation(location);
+    if (config.getCloudSdkLocation() == null) {
+      File location = CloudSdkPrompter.getCloudSdkLocation(getShell());
+      if (location == null) {
+        return false;
       }
-
-      if (page instanceof AppEngineStandardWizardPage) {
-        AppEngineStandardWizardPage createProjectPage = (AppEngineStandardWizardPage) page;
-        config.setAppEngineProjectId(createProjectPage.getAppEngineProjectId());
-        config.setPackageName(createProjectPage.getPackageName());
-
-        config.setProject(createProjectPage.getProjectHandle());
-        if (!createProjectPage.useDefaults()) {
-          config.setEclipseProjectLocationUri(createProjectPage.getLocationURI());
-        }
-
-        config.setAppEngineLibraries(createProjectPage.getSelectedLibraries());
-      }
-
-      // todo set up
-      final IAdaptable uiInfoAdapter = WorkspaceUndoUtil.getUIInfoAdapter(getShell());
-      IRunnableWithProgress runnable = new CreateAppEngineStandardWtpProject(config, uiInfoAdapter);
-
-      IStatus status = Status.OK_STATUS;
-      try {
-        boolean fork = true;
-        boolean cancelable = true;
-        getContainer().run(fork, cancelable, runnable);
-      } catch (InterruptedException ex) {
-        status = Status.CANCEL_STATUS;
-      } catch (InvocationTargetException ex) {
-        status = setErrorStatus(ex.getCause());
-      }
-
-      return status.isOK();
+      config.setCloudSdkLocation(location);
     }
-    return true;
+
+    AppEngineStandardWizardPage createProjectPage = (AppEngineStandardWizardPage) page;
+    config.setAppEngineProjectId(createProjectPage.getAppEngineProjectId());
+    config.setPackageName(createProjectPage.getPackageName());
+
+    config.setProject(createProjectPage.getProjectHandle());
+    if (!createProjectPage.useDefaults()) {
+      config.setEclipseProjectLocationUri(createProjectPage.getLocationURI());
+    }
+
+    config.setAppEngineLibraries(createProjectPage.getSelectedLibraries());
+
+    // todo set up
+    final IAdaptable uiInfoAdapter = WorkspaceUndoUtil.getUIInfoAdapter(getShell());
+    IRunnableWithProgress runnable = new CreateAppEngineStandardWtpProject(config, uiInfoAdapter);
+
+    IStatus status = Status.OK_STATUS;
+    try {
+      boolean fork = true;
+      boolean cancelable = true;
+      getContainer().run(fork, cancelable, runnable);
+    } catch (InterruptedException ex) {
+      status = Status.CANCEL_STATUS;
+    } catch (InvocationTargetException ex) {
+      status = setErrorStatus(ex.getCause());
+    }
+
+    return status.isOK();
   }
 
   // visible for testing
