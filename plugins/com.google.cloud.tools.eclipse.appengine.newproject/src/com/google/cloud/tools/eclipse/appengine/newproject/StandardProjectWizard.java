@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Google Inc. All Rights Reserved.
+ * Copyright 2016 Google Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,7 +75,7 @@ public class StandardProjectWizard extends Wizard implements INewWizard {
         config.setCloudSdkLocation(location);
       }
 
-      if ((page != null) && (page instanceof AppEngineStandardWizardPage)) {
+      if (page instanceof AppEngineStandardWizardPage) {
         AppEngineStandardWizardPage createProjectPage = (AppEngineStandardWizardPage) page;
         config.setAppEngineProjectId(createProjectPage.getAppEngineProjectId());
         config.setPackageName(createProjectPage.getPackageName());
@@ -125,9 +125,8 @@ public class StandardProjectWizard extends Wizard implements INewWizard {
   }
 
   private boolean doesAppEngineJavaComponentExist() {
-    CloudSdk cloudSdk = new CloudSdk.Builder().build();
     try {
-      cloudSdk.validateAppEngineJavaComponents();
+      new CloudSdk.Builder().build().validateAppEngineJavaComponents();
       return true;
     } catch (AppEngineJavaComponentsNotInstalledException ex) {
       return false;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Google Inc. All Rights Reserved.
+ * Copyright 2016 Google Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -114,7 +114,7 @@ public class AppEngineStandardWizardPage extends WizardNewProjectCreationPage {
 
   private void addManageLibrariesWidgets(Composite container) {
     apiGroup = new Group(container, SWT.NONE);
-    apiGroup.setText(Messages.getString("appengine.standard.wizard.page.libraries.group.label"));
+    apiGroup.setText(Messages.AppEngineStandardWizardPage_librariesGroupLabel);
     GridDataFactory.fillDefaults().span(2, 1).applyTo(apiGroup);
 
     List<Library> libraries = getLibraries();

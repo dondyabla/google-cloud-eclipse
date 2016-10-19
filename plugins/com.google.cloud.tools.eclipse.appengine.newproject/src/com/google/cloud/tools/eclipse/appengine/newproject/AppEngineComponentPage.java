@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Google Inc. All Rights Reserved.
+ * Copyright 2016 Google Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,10 +24,6 @@ import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Text;
-
-import com.google.cloud.tools.eclipse.usagetracker.AnalyticsEvents;
-import com.google.cloud.tools.eclipse.usagetracker.AnalyticsPingManager;
 
 /**
  * AppEngineComponentPage is a page that displays a message that Gcloud App Engine Java component is missing
@@ -38,29 +34,23 @@ public class AppEngineComponentPage extends WizardPage {
   protected AppEngineComponentPage() {
     super("appEngineComponentPage");
     setTitle("App Engine Component is missing");
-    // TODO: do we need the description?
     setDescription("The Cloud SDK App Engine Java component is not installed"); 
   }
 
   @Override
   public void createControl(Composite parent) {
-    // TODO: should we create a ping for missing app engine component
-    AnalyticsPingManager.getInstance().sendPing(
-        AnalyticsEvents.APP_ENGINE_NEW_PROJECT_WIZARD,
-        AnalyticsEvents.APP_ENGINE_NEW_PROJECT_WIZARD_TYPE,
-        AnalyticsEvents.APP_ENGINE_NEW_PROJECT_WIZARD_TYPE_NATIVE, parent.getShell());
-
     Composite container = new Composite(parent, SWT.NONE);
     GridLayoutFactory.swtDefaults().numColumns(1).applyTo(container);
 
     GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
     gridData.widthHint = parent.getSize().x;
 
-    String message = Messages.getString("appengine.java.component.missing");
+    String message = Messages.AppEngineJavaComponentMissing;
     StyledText styledText = new StyledText(container, SWT.MULTI | SWT.READ_ONLY | SWT.WRAP);
     styledText.setLayoutData(gridData);
     styledText.setText(message);
     styledText.setBackground(container.getBackground());
+    styledText.setCaret(null /* hide caret */);
 
     int startIndex = message.indexOf("\'");
     int endIndex = message.indexOf("\'", startIndex + 1);
