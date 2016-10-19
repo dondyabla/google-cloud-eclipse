@@ -118,7 +118,7 @@ public class DeployPropertyPage extends PropertyPage {
       return new StandardDeployPreferencesPanel(container, project, loginService,
           getLayoutChangedHandler(), false /* requireValues */);
     } else if (AppEngineFlexFacet.hasAppEngineFacet(facetedProject)) {
-      return new FlexDeployPreferencesPanel(container);
+      return new FlexDeployPreferencesPanel(container, project);
     } else {
       throw new IllegalStateException(project.getName() + " does not have an App Engine facet.");
     }

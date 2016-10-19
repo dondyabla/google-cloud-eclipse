@@ -73,7 +73,7 @@ public class FlexDeployPreferences {
         FlexDeployPreferenceInitializer.DEFAULT_USE_DEPLOYMENT_PREFERENCES);
   }
 
-  public void getUseDeploymentPreferences(boolean useDeploymentPreferences) {
+  public void setUseDeploymentPreferences(boolean useDeploymentPreferences) {
     preferenceStore.putBoolean(PREF_USE_DEPLOYMENT_PREFERENCES, useDeploymentPreferences);
   }
 

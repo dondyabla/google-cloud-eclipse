@@ -17,6 +17,7 @@
 package com.google.cloud.tools.eclipse.appengine.deploy.ui;
 
 import org.eclipse.core.databinding.DataBindingContext;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
@@ -29,8 +30,11 @@ import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
+import com.google.cloud.tools.eclipse.appengine.deploy.flex.FlexDeployPreferences;
+
 public class FlexDeployPreferencesPanel extends DeployPreferencesPanel {
   private static final int LINKED_CHILD_INDENT = 10;
+  private FlexDeployPreferences preferences;
   private Button useValuesButton;
   private Label gaeConfigFolderLabel;
   private Text gaeConfigFolderText;
@@ -39,9 +43,11 @@ public class FlexDeployPreferencesPanel extends DeployPreferencesPanel {
   private Text dockerFileText;
   private Button dockerFileBrowseButton;
 
-  public FlexDeployPreferencesPanel(Composite parent) {
+  public FlexDeployPreferencesPanel(Composite parent, IProject project) {
     super(parent, SWT.NONE);
     createConfigurationFilesSection();
+    FlexDeployPreferences preferences = new FlexDeployPreferences(project);
+    applyPreferences(preferences);
   }
 
   @Override
@@ -51,12 +57,15 @@ public class FlexDeployPreferencesPanel extends DeployPreferencesPanel {
 
   @Override
   public void resetToDefaults() {
-    // TODO update this
+    applyPreferences(FlexDeployPreferences.DEFAULT);
   }
 
   @Override
   public boolean savePreferences() {
-    return false;
+    preferences.setUseDeploymentPreferences(useValuesButton.getEnabled());
+    preferences.setAppEngineConfigFolder(gaeConfigFolderText.getText().trim());
+    preferences.setDockerFileLocation(dockerFileText.getText().trim());
+    return true;
   }
 
   private void createConfigurationFilesSection() {
@@ -135,6 +144,12 @@ public class FlexDeployPreferencesPanel extends DeployPreferencesPanel {
     dockerFileLabel.setEnabled(enabled);
     dockerFileText.setEnabled(enabled);
     dockerFileBrowseButton.setEnabled(enabled);
+  }
+
+  private void applyPreferences(FlexDeployPreferences preferences) {
+    useValuesButton.setEnabled(preferences.getUseDeploymentPreferences());
+    gaeConfigFolderText.setText(preferences.getAppEngineConfigFolder());
+    dockerFileText.setText(preferences.getDockerFileLocation());
   }
 
 }
