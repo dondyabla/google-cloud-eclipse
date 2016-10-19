@@ -25,6 +25,9 @@ import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 
+import com.google.cloud.tools.eclipse.usagetracker.AnalyticsEvents;
+import com.google.cloud.tools.eclipse.usagetracker.AnalyticsPingManager;
+
 /**
  * AppEngineComponentPage is a page that displays a message that Gcloud App Engine Java component is missing
  * with instructions on how to install it. This page disables the 'Finish' button.
@@ -39,6 +42,11 @@ public class AppEngineComponentPage extends WizardPage {
 
   @Override
   public void createControl(Composite parent) {
+    AnalyticsPingManager.getInstance().sendPing(
+        AnalyticsEvents.APP_ENGINE_NEW_PROJECT_WIZARD,
+        AnalyticsEvents.APP_ENGINE_NEW_PROJECT_WIZARD_TYPE,
+        AnalyticsEvents.APP_ENGINE_NEW_PROJECT_WIZARD_TYPE_NATIVE, parent.getShell());
+
     Composite container = new Composite(parent, SWT.NONE);
     GridLayoutFactory.swtDefaults().numColumns(1).applyTo(container);
 
