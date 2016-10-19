@@ -27,8 +27,9 @@ public class FlexDeployPreferences {
   public static final String PREFERENCE_STORE_QUALIFIER = "com.google.cloud.tools.eclipse.appengine.deploy.flex";
   public static final FlexDeployPreferences DEFAULT;
 
-  static final String PREF_APP_ENGINE_CONFIG_FOLDER = "app.engine.config.folder";
+  static final String PREF_APP_ENGINE_CONFIG_FOLDER = "appengine.config.folder";
   static final String PREF_DOCKER_FILE_LOCATION = "docker.file.location";
+  static final String PREF_USE_DEPLOYMENT_PREFERENCES = "use.deployment.preferences";
 
   private IEclipsePreferences preferenceStore;
 
@@ -54,8 +55,8 @@ public class FlexDeployPreferences {
         FlexDeployPreferenceInitializer.DEFAULT_APP_ENGINE_CONFIG_FOLDER);
   }
 
-  public void setAppEngineConfigFolder(String accountEmail) {
-    preferenceStore.put(PREF_APP_ENGINE_CONFIG_FOLDER, accountEmail);
+  public void setAppEngineConfigFolder(String appEngineConfigFolder) {
+    preferenceStore.put(PREF_APP_ENGINE_CONFIG_FOLDER, appEngineConfigFolder);
   }
   
   public String getDockerFileLocation() {
@@ -63,8 +64,17 @@ public class FlexDeployPreferences {
         FlexDeployPreferenceInitializer.DEFAULT_DOCKER_FILE_LOCATION);
   }
 
-  public void setDockerFileLocation(String version) {
-    preferenceStore.put(PREF_DOCKER_FILE_LOCATION, version);
+  public void setDockerFileLocation(String dockerFileLocation) {
+    preferenceStore.put(PREF_DOCKER_FILE_LOCATION, dockerFileLocation);
+  }
+
+  public boolean getUseDeploymentPreferences() {
+    return preferenceStore.getBoolean(PREF_USE_DEPLOYMENT_PREFERENCES,
+        FlexDeployPreferenceInitializer.DEFAULT_USE_DEPLOYMENT_PREFERENCES);
+  }
+
+  public void getUseDeploymentPreferences(boolean useDeploymentPreferences) {
+    preferenceStore.putBoolean(PREF_USE_DEPLOYMENT_PREFERENCES, useDeploymentPreferences);
   }
 
 }
