@@ -20,13 +20,14 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import com.google.cloud.tools.eclipse.appengine.facets.AppEngineStandardFacet;
+import com.google.cloud.tools.eclipse.swtbot.SwtBotProjectActions;
 import com.google.cloud.tools.eclipse.util.FacetedProjectHelper;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.wst.common.project.facet.core.IFacetedProject;
 import org.junit.Test;
 
-public class DeployPropertiesPageTest extends AbstractProjectTests {
+public class DeployPropertyPageTest extends AbstractProjectTests {
   // TODO: add tests for flex project when Create New Flex project wizard is available
   @Test
   public void testPropertyPageTitle_standardProject() throws CoreException {
@@ -38,7 +39,7 @@ public class DeployPropertiesPageTest extends AbstractProjectTests {
     assertTrue(
         new FacetedProjectHelper().projectHasFacet(facetedProject, AppEngineStandardFacet.ID));
 
-    SwtBotAppEngineActions.openProjectProperties(bot, projectName);
+    SwtBotProjectActions.openProjectProperties(bot, projectName);
     bot.tree().expandNode("Google Cloud Platform").select("App Engine Deployment"); 
     bot.textWithLabel("App Engine Deployment - Standard Environment");
   }

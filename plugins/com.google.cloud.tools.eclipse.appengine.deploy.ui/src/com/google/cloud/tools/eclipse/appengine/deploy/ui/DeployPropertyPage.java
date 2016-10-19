@@ -123,7 +123,7 @@ public class DeployPropertyPage extends PropertyPage {
       setTitle(Messages.getString("flex.page.title"));
       return new FlexDeployPreferencesPanel(container);
     } else {
-      // App Engine Deployment property page is only visible if project contains an App Engine facet
+      logger.log(Level.WARNING, "App Engine Deployment property page is only visible if project contains an App Engine facet");
       return null;
     }
   }
