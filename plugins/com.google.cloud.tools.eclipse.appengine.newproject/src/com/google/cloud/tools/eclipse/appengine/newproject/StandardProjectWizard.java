@@ -75,9 +75,7 @@ public class StandardProjectWizard extends Wizard implements INewWizard {
     }
 
     AppEngineStandardWizardPage createProjectPage = (AppEngineStandardWizardPage) page;
-    config.setAppEngineProjectId(createProjectPage.getAppEngineProjectId());
     config.setPackageName(createProjectPage.getPackageName());
-
     config.setProject(createProjectPage.getProjectHandle());
     if (!createProjectPage.useDefaults()) {
       config.setEclipseProjectLocationUri(createProjectPage.getLocationURI());
