@@ -46,7 +46,7 @@ public class FlexDeployPreferencesPanel extends DeployPreferencesPanel {
   public FlexDeployPreferencesPanel(Composite parent, IProject project) {
     super(parent, SWT.NONE);
     createConfigurationFilesSection();
-    FlexDeployPreferences preferences = new FlexDeployPreferences(project);
+    preferences = new FlexDeployPreferences(project);
     applyPreferences(preferences);
   }
 
@@ -62,7 +62,7 @@ public class FlexDeployPreferencesPanel extends DeployPreferencesPanel {
 
   @Override
   public boolean savePreferences() {
-    preferences.setUseDeploymentPreferences(useValuesButton.getEnabled());
+    preferences.setUseDeploymentPreferences(useValuesButton.getSelection());
     preferences.setAppEngineConfigFolder(gaeConfigFolderText.getText().trim());
     preferences.setDockerFileLocation(dockerFileText.getText().trim());
     return true;
@@ -108,7 +108,6 @@ public class FlexDeployPreferencesPanel extends DeployPreferencesPanel {
     linkedChildData.applyTo(dockerFileLabel);
 
     GridLayoutFactory.fillDefaults().numColumns(3).generateLayout(this);
-    updateControls();
   }
 
   private void browseForConfigFolder() {
@@ -147,9 +146,10 @@ public class FlexDeployPreferencesPanel extends DeployPreferencesPanel {
   }
 
   private void applyPreferences(FlexDeployPreferences preferences) {
-    useValuesButton.setEnabled(preferences.getUseDeploymentPreferences());
+    useValuesButton.setSelection(preferences.getUseDeploymentPreferences());
     gaeConfigFolderText.setText(preferences.getAppEngineConfigFolder());
     dockerFileText.setText(preferences.getDockerFileLocation());
+    updateControls();
   }
 
 }

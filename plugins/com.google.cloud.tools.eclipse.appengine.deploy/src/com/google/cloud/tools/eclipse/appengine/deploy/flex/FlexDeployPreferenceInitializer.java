@@ -26,6 +26,7 @@ public class FlexDeployPreferenceInitializer extends AbstractPreferenceInitializ
 
   static final String DEFAULT_APP_ENGINE_CONFIG_FOLDER = "";
   static final String DEFAULT_DOCKER_FILE_LOCATION = "";
+  static final boolean DEFAULT_USE_DEPLOYMENT_PREFERENCES = false;
 
   @Override
   public void initializeDefaultPreferences() {
@@ -33,6 +34,7 @@ public class FlexDeployPreferenceInitializer extends AbstractPreferenceInitializ
         DefaultScope.INSTANCE.getNode(PREFERENCE_STORE_DEFAULTS_QUALIFIER);
     preferences.put(FlexDeployPreferences.PREF_APP_ENGINE_CONFIG_FOLDER, DEFAULT_APP_ENGINE_CONFIG_FOLDER);
     preferences.put(FlexDeployPreferences.PREF_DOCKER_FILE_LOCATION, DEFAULT_DOCKER_FILE_LOCATION);
+    preferences.putBoolean(FlexDeployPreferences.PREF_USE_DEPLOYMENT_PREFERENCES, DEFAULT_USE_DEPLOYMENT_PREFERENCES);
   }
 
   public static IEclipsePreferences getDefaultPreferences() {
