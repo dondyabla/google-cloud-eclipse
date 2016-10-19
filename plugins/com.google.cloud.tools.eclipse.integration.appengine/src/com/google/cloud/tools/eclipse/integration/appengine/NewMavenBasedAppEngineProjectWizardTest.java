@@ -26,6 +26,7 @@ import com.google.cloud.tools.eclipse.appengine.facets.AppEngineStandardFacet;
 import com.google.cloud.tools.eclipse.swtbot.SwtBotProjectActions;
 import com.google.cloud.tools.eclipse.util.FacetedProjectHelper;
 import com.google.cloud.tools.eclipse.util.MavenUtils;
+import com.google.common.base.Joiner;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -35,6 +36,7 @@ import org.eclipse.wst.common.project.facet.core.IFacetedProject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -48,40 +50,40 @@ public class NewMavenBasedAppEngineProjectWizardTest extends AbstractProjectTest
 
   @Test
   public void testHelloWorld() throws Exception {
-    // appengine-skeleton-archetype still missing base index.html and HelloWorld.java
     String[] projectFiles =
         {"src/main/webapp/WEB-INF/appengine-web.xml", "src/main/webapp/WEB-INF/web.xml", "pom.xml"};
-    createAndCheck("appWithPackage", null, "app.engine.test", null, "Hello-world template",
+    createAndCheck("appWithPackageProject", null, "com.example.baz", null, "Hello World template",
         projectFiles);
-    assertEquals("${app.id}",
-        SwtBotAppEngineActions
-            .getAppEngineProjectId(project.getFile("src/main/webapp/WEB-INF/appengine-web.xml")));
+  }
+
+  @Test
+  public void testHelloWorldInTemp() throws Exception {
+    File location = File.createTempFile("maven", "dir");
+    assertTrue("Unable to remove temp file", location.delete());
+    assertTrue("Unable to turn temp location -> dir", location.mkdir());
+
+    String[] projectFiles =
+        {"src/main/webapp/WEB-INF/appengine-web.xml", "src/main/webapp/WEB-INF/web.xml", "pom.xml"};
+    createAndCheck("appWithPackageProjectInTemp", location.getAbsolutePath(), "com.example.foo", null,
+        "Hello World template", projectFiles);
   }
 
   @Test
   public void testGuestbookExampleNoProjectId() throws Exception {
-    // appengine-skeleton-archetype still missing base index.html and HelloWorld.java
     String[] projectFiles = {"src/main/webapp/guestbook.jsp",
         "src/main/webapp/WEB-INF/appengine-web.xml", "src/main/webapp/WEB-INF/web.xml", "pom.xml"};
-    createAndCheck("guestbookExample", null, "app.engine.test", null, "Guestbook example",
+    createAndCheck("guestbookExampleProject", null, "com.example.bar", null, "Guestbook example",
         projectFiles);
-    assertEquals("${app.id}",
-        SwtBotAppEngineActions
-            .getAppEngineProjectId(project.getFile("src/main/webapp/WEB-INF/appengine-web.xml")));
     // no projectId then archetypes use artifactID
-    assertEquals("guestbookExample", getPomProperty(project, "app.id"));
+    assertEquals("guestbookExampleProject", getPomProperty(project, "app.id"));
   }
 
   @Test
   public void testGuestbookExampleWithProjectId() throws Exception {
-    // appengine-skeleton-archetype still missing base index.html and HelloWorld.java
     String[] projectFiles = {"src/main/webapp/guestbook.jsp",
         "src/main/webapp/WEB-INF/appengine-web.xml", "src/main/webapp/WEB-INF/web.xml", "pom.xml"};
-    createAndCheck("guestbookExample", null, "app.engine.test", "my-project-id",
+    createAndCheck("guestbookExampleProjectWithProjectId", null, "app.engine.test", "my-project-id",
         "Guestbook example", projectFiles);
-    assertEquals("${app.id}",
-        SwtBotAppEngineActions
-            .getAppEngineProjectId(project.getFile("src/main/webapp/WEB-INF/appengine-web.xml")));
     assertEquals("my-project-id", getPomProperty(project, "app.id"));
   }
 
@@ -93,17 +95,21 @@ public class NewMavenBasedAppEngineProjectWizardTest extends AbstractProjectTest
   }
 
   /** Create a project with the given parameters. */
-  private void createAndCheck(String projectName, String location,
+  private void createAndCheck(String artifactId, String location,
       String packageName, String projectId, String archetypeDescription, String[] projectFiles)
-      throws Exception {
-    assertFalse(projectExists(projectName));
-    project = SwtBotAppEngineActions.createMavenWebAppProject(bot, location, "test", projectName,
+      throws CoreException, IOException {
+    assertFalse(projectExists(artifactId));
+    project = SwtBotAppEngineActions.createMavenWebAppProject(bot, location, "test", artifactId,
         packageName, projectId, archetypeDescription);
     assertTrue(project.exists());
+    if (location != null) {
+      assertEquals(new File(location).getCanonicalPath(),
+          project.getLocation().toFile().getParentFile().getCanonicalPath());
+    }
 
     IFacetedProject facetedProject = new FacetedProjectHelper().getFacetedProject(project);
     assertNotNull("m2e-wtp should create a faceted project", facetedProject);
-    assertTrue(
+    assertTrue("Project does not have standard facet",
         new FacetedProjectHelper().projectHasFacet(facetedProject, AppEngineStandardFacet.ID));
 
     for (String projectFile : projectFiles) {
@@ -112,7 +118,8 @@ public class NewMavenBasedAppEngineProjectWizardTest extends AbstractProjectTest
     }
     List<String> buildErrors = SwtBotProjectActions.getAllBuildErrors(bot);
     if (!buildErrors.isEmpty()) {
-      fail(buildErrors.get(0));
+      String errorsString = Joiner.on("\n").join(buildErrors);
+      fail(errorsString);
     }
   }
 }

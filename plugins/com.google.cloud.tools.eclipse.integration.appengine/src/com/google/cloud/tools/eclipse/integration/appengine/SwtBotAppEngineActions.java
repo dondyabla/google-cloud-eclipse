@@ -16,34 +16,20 @@
 
 package com.google.cloud.tools.eclipse.integration.appengine;
 
-import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.widgetOfType;
-
-import com.google.cloud.tools.eclipse.appengine.deploy.AppEngineDeployInfo;
 import com.google.cloud.tools.eclipse.swtbot.SwtBotTestingUtilities;
 import com.google.cloud.tools.eclipse.swtbot.SwtBotTimeoutManager;
 import com.google.cloud.tools.eclipse.swtbot.SwtBotWorkbenchActions;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.swt.widgets.Tree;
-import org.eclipse.swt.widgets.Widget;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
-import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
-import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
-
-import java.io.IOException;
-import java.io.InputStream;
 
 /**
- * Useful App Engine-related actions for Google Cloud Tools for Eclipse
+ * Useful App Engine-related actions for Google Cloud Tools for Eclipse.
  */
 public class SwtBotAppEngineActions {
 
@@ -155,21 +141,4 @@ public class SwtBotAppEngineActions {
   }
 
   private SwtBotAppEngineActions() {}
-
-  /**
-   * Extracts the project ID from the given file.
-   * 
-   * @return the project ID or {@code null} if none found
-   */
-  public static String getAppEngineProjectId(IFile appEngineXml) throws IOException, CoreException {
-    try (InputStream contents = appEngineXml.getContents()) {
-      AppEngineDeployInfo info = new AppEngineDeployInfo();
-      info.parse(contents);
-      String projectId = info.getProjectId();
-      if (projectId == null || projectId.trim().isEmpty()) {
-        return null;
-      }
-      return projectId;
-    }
-  }
 }
