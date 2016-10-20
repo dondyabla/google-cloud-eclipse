@@ -22,7 +22,6 @@ import java.util.logging.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.databinding.preference.PreferencePageSupport;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
@@ -54,9 +53,11 @@ public class DeployPropertyPage extends PropertyPage {
     Composite container = new Composite(parent, SWT.NONE);
     try {
       content = getPreferencesPanel(container);
+      if (content == null) {
+        return container;
+      }
     } catch (CoreException ex) {
       logger.log(Level.WARNING, ex.getMessage());
-      MessageDialog.openError(getShell(), "Error creating App Engine Deployment property page", ex.getMessage());
       return container;
     }
 
@@ -115,12 +116,15 @@ public class DeployPropertyPage extends PropertyPage {
         PlatformUI.getWorkbench().getService(IGoogleLoginService.class);
 
     if (AppEngineStandardFacet.hasAppEngineFacet(facetedProject)) {
-      return new StandardDeployPreferencesPanel(container, project, loginService,
-          getLayoutChangedHandler(), false /* requireValues */);
+      setTitle(Messages.getString("standard.page.title"));
+      return new StandardDeployPreferencesPanel(
+          container, project, loginService, getLayoutChangedHandler(), false /* requireValues */);
     } else if (AppEngineFlexFacet.hasAppEngineFacet(facetedProject)) {
+      setTitle(Messages.getString("flex.page.title"));
       return new FlexDeployPreferencesPanel(container, project);
     } else {
-      throw new IllegalStateException(project.getName() + " does not have an App Engine facet.");
+      logger.log(Level.WARNING, "App Engine Deployment property page is only visible if project contains an App Engine facet");
+      return null;
     }
   }
 }
