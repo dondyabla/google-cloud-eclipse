@@ -18,7 +18,9 @@ package com.google.cloud.tools.eclipse.appengine.deploy.flex;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.text.IsEmptyString.isEmptyString;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.times;
@@ -34,7 +36,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class FlexDeployPreferencesTest {
   @Mock private IEclipsePreferences mockEclipsePreferences;
-  
+
   @Test
   public void testDefaultAppEngineConfigFolder() {
     assertThat(FlexDeployPreferences.DEFAULT.getAppEngineConfigFolder(), isEmptyString());
@@ -44,7 +46,12 @@ public class FlexDeployPreferencesTest {
   public void testDefaultDockerFileLocation() {
     assertThat(FlexDeployPreferences.DEFAULT.getAppEngineConfigFolder(), isEmptyString());
   }
-  
+
+  @Test
+  public void testDefaultUseDeploymentPreferences() {
+    assertFalse(FlexDeployPreferences.DEFAULT.getUseDeploymentPreferences());
+  }
+
   @Test
   public void testGetAppEngineConfigFolder() {
     when(mockEclipsePreferences.get(eq(FlexDeployPreferences.PREF_APP_ENGINE_CONFIG_FOLDER), anyString()))
@@ -52,14 +59,14 @@ public class FlexDeployPreferencesTest {
     FlexDeployPreferences flexDeployPreferences = new FlexDeployPreferences(mockEclipsePreferences);
     assertThat(flexDeployPreferences.getAppEngineConfigFolder(), is("configFolder"));
   }
-  
+
   @Test
   public void testSetAppEngineConfigFolder() {
     FlexDeployPreferences flexDeployPreferences = new FlexDeployPreferences(mockEclipsePreferences);
     flexDeployPreferences.setAppEngineConfigFolder("configFolder");
     verify(mockEclipsePreferences, times(1)).put(eq(FlexDeployPreferences.PREF_APP_ENGINE_CONFIG_FOLDER), eq("configFolder"));
   }
-  
+
   @Test
   public void testGetDockerFileLocation() {
     when(mockEclipsePreferences.get(eq(FlexDeployPreferences.PREF_DOCKER_FILE_LOCATION), anyString()))
@@ -67,11 +74,26 @@ public class FlexDeployPreferencesTest {
     FlexDeployPreferences flexDeployPreferences = new FlexDeployPreferences(mockEclipsePreferences);
     assertThat(flexDeployPreferences.getDockerFileLocation(), is("dockerFileLocation"));
   }
-  
+
   @Test
   public void testSetDockerFileLocation() {
     FlexDeployPreferences flexDeployPreferences = new FlexDeployPreferences(mockEclipsePreferences);
     flexDeployPreferences.setDockerFileLocation("dockerFileLocation");
     verify(mockEclipsePreferences, times(1)).put(eq(FlexDeployPreferences.PREF_DOCKER_FILE_LOCATION), eq("dockerFileLocation"));
+  }
+
+  @Test
+  public void testGetUseDeploymentPreferences() {
+    when(mockEclipsePreferences.getBoolean(eq(FlexDeployPreferences.PREF_USE_DEPLOYMENT_PREFERENCES), anyBoolean()))
+      .thenReturn(false);
+    FlexDeployPreferences flexDeployPreferences = new FlexDeployPreferences(mockEclipsePreferences);
+    assertFalse(flexDeployPreferences.getUseDeploymentPreferences());
+  }
+
+  @Test
+  public void testSetUseDeploymentPreferences() {
+    FlexDeployPreferences flexDeployPreferences = new FlexDeployPreferences(mockEclipsePreferences);
+    flexDeployPreferences.setUseDeploymentPreferences(true);
+    verify(mockEclipsePreferences, times(1)).putBoolean(eq(FlexDeployPreferences.PREF_USE_DEPLOYMENT_PREFERENCES), eq(true));
   }
 }
