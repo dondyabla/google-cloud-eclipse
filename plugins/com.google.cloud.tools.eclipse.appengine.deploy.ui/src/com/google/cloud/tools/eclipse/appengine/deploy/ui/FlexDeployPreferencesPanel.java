@@ -63,8 +63,8 @@ public class FlexDeployPreferencesPanel extends DeployPreferencesPanel {
   @Override
   public boolean savePreferences() {
     preferences.setUseDeploymentPreferences(useValuesButton.getSelection());
-    preferences.setAppEngineConfigFolder(gaeConfigFolderText.getText().trim());
-    preferences.setDockerFileLocation(dockerFileText.getText().trim());
+    preferences.setAppEngineDirectory(gaeConfigFolderText.getText().trim());
+    preferences.setDockerDirectory(dockerFileText.getText().trim());
     return true;
   }
 
@@ -147,8 +147,8 @@ public class FlexDeployPreferencesPanel extends DeployPreferencesPanel {
 
   private void applyPreferences(FlexDeployPreferences preferences) {
     useValuesButton.setSelection(preferences.getUseDeploymentPreferences());
-    gaeConfigFolderText.setText(preferences.getAppEngineConfigFolder());
-    dockerFileText.setText(preferences.getDockerFileLocation());
+    gaeConfigFolderText.setText(preferences.getAppEngineDirectory());
+    dockerFileText.setText(preferences.getDockerDirectory());
     updateControls();
   }
 

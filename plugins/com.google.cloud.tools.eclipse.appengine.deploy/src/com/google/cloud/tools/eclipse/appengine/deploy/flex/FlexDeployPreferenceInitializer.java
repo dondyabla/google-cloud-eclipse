@@ -24,16 +24,16 @@ public class FlexDeployPreferenceInitializer extends AbstractPreferenceInitializ
   private static final String PREFERENCE_STORE_DEFAULTS_QUALIFIER =
       "com.google.cloud.tools.eclipse.appengine.deploy.flex.defaults";
 
-  static final String DEFAULT_APP_ENGINE_CONFIG_FOLDER = "";
-  static final String DEFAULT_DOCKER_FILE_LOCATION = "";
+  static final String DEFAULT_APP_ENGINE_DIRECTORY = "";
+  static final String DEFAULT_DOCKER_DIRECTORY = "";
   static final boolean DEFAULT_USE_DEPLOYMENT_PREFERENCES = false;
 
   @Override
   public void initializeDefaultPreferences() {
     IEclipsePreferences preferences =
         DefaultScope.INSTANCE.getNode(PREFERENCE_STORE_DEFAULTS_QUALIFIER);
-    preferences.put(FlexDeployPreferences.PREF_APP_ENGINE_CONFIG_FOLDER, DEFAULT_APP_ENGINE_CONFIG_FOLDER);
-    preferences.put(FlexDeployPreferences.PREF_DOCKER_FILE_LOCATION, DEFAULT_DOCKER_FILE_LOCATION);
+    preferences.put(FlexDeployPreferences.PREF_APP_ENGINE_DIRECTORY, DEFAULT_APP_ENGINE_DIRECTORY);
+    preferences.put(FlexDeployPreferences.PREF_DOCKER_DIRECTORY, DEFAULT_DOCKER_DIRECTORY);
     preferences.putBoolean(FlexDeployPreferences.PREF_USE_DEPLOYMENT_PREFERENCES, DEFAULT_USE_DEPLOYMENT_PREFERENCES);
   }
 

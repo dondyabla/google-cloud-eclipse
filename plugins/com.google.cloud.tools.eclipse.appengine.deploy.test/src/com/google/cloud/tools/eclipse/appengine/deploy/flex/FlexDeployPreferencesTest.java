@@ -38,13 +38,13 @@ public class FlexDeployPreferencesTest {
   @Mock private IEclipsePreferences mockEclipsePreferences;
 
   @Test
-  public void testDefaultAppEngineConfigFolder() {
-    assertThat(FlexDeployPreferences.DEFAULT.getAppEngineConfigFolder(), isEmptyString());
+  public void testDefaultAppEngineDirectory() {
+    assertThat(FlexDeployPreferences.DEFAULT.getAppEngineDirectory(), isEmptyString());
   }
 
   @Test
-  public void testDefaultDockerFileLocation() {
-    assertThat(FlexDeployPreferences.DEFAULT.getDockerFileLocation(), isEmptyString());
+  public void testDefaultDockerDirectory() {
+    assertThat(FlexDeployPreferences.DEFAULT.getDockerDirectory(), isEmptyString());
   }
 
   @Test
@@ -53,33 +53,33 @@ public class FlexDeployPreferencesTest {
   }
 
   @Test
-  public void testGetAppEngineConfigFolder() {
-    when(mockEclipsePreferences.get(eq(FlexDeployPreferences.PREF_APP_ENGINE_CONFIG_FOLDER), anyString()))
+  public void testGetAppEngineDirectory() {
+    when(mockEclipsePreferences.get(eq(FlexDeployPreferences.PREF_APP_ENGINE_DIRECTORY), anyString()))
       .thenReturn("configFolder");
     FlexDeployPreferences flexDeployPreferences = new FlexDeployPreferences(mockEclipsePreferences);
-    assertThat(flexDeployPreferences.getAppEngineConfigFolder(), is("configFolder"));
+    assertThat(flexDeployPreferences.getAppEngineDirectory(), is("configFolder"));
   }
 
   @Test
-  public void testSetAppEngineConfigFolder() {
+  public void testSetAppEngineDirectory() {
     FlexDeployPreferences flexDeployPreferences = new FlexDeployPreferences(mockEclipsePreferences);
-    flexDeployPreferences.setAppEngineConfigFolder("configFolder");
-    verify(mockEclipsePreferences, times(1)).put(eq(FlexDeployPreferences.PREF_APP_ENGINE_CONFIG_FOLDER), eq("configFolder"));
+    flexDeployPreferences.setAppEngineDirectory("configFolder");
+    verify(mockEclipsePreferences, times(1)).put(eq(FlexDeployPreferences.PREF_APP_ENGINE_DIRECTORY), eq("configFolder"));
   }
 
   @Test
-  public void testGetDockerFileLocation() {
-    when(mockEclipsePreferences.get(eq(FlexDeployPreferences.PREF_DOCKER_FILE_LOCATION), anyString()))
-      .thenReturn("dockerFileLocation");
+  public void testGetDockerDirectory() {
+    when(mockEclipsePreferences.get(eq(FlexDeployPreferences.PREF_DOCKER_DIRECTORY), anyString()))
+      .thenReturn("DockerDirectory");
     FlexDeployPreferences flexDeployPreferences = new FlexDeployPreferences(mockEclipsePreferences);
-    assertThat(flexDeployPreferences.getDockerFileLocation(), is("dockerFileLocation"));
+    assertThat(flexDeployPreferences.getDockerDirectory(), is("DockerDirectory"));
   }
 
   @Test
-  public void testSetDockerFileLocation() {
+  public void testSetDockerDirectory() {
     FlexDeployPreferences flexDeployPreferences = new FlexDeployPreferences(mockEclipsePreferences);
-    flexDeployPreferences.setDockerFileLocation("dockerFileLocation");
-    verify(mockEclipsePreferences, times(1)).put(eq(FlexDeployPreferences.PREF_DOCKER_FILE_LOCATION), eq("dockerFileLocation"));
+    flexDeployPreferences.setDockerDirectory("DockerDirectory");
+    verify(mockEclipsePreferences, times(1)).put(eq(FlexDeployPreferences.PREF_DOCKER_DIRECTORY), eq("DockerDirectory"));
   }
 
   @Test

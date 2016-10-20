@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.eclipse.appengine.deploy.flex;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
@@ -25,8 +26,8 @@ public class FlexDeployPreferences {
   public static final String PREFERENCE_STORE_QUALIFIER = "com.google.cloud.tools.eclipse.appengine.deploy.flex";
   public static final FlexDeployPreferences DEFAULT;
 
-  static final String PREF_APP_ENGINE_CONFIG_FOLDER = "appengine.config.folder";
-  static final String PREF_DOCKER_FILE_LOCATION = "docker.file.location";
+  static final String PREF_APP_ENGINE_DIRECTORY = "appengine.config.folder";
+  static final String PREF_DOCKER_DIRECTORY = "docker.file.location";
   static final String PREF_USE_DEPLOYMENT_PREFERENCES = "use.deployment.preferences";
 
   private IEclipsePreferences preferenceStore;
@@ -48,22 +49,22 @@ public class FlexDeployPreferences {
     preferenceStore.flush();
   }
 
-  public String getAppEngineConfigFolder() {
-    return preferenceStore.get(PREF_APP_ENGINE_CONFIG_FOLDER,
-        FlexDeployPreferenceInitializer.DEFAULT_APP_ENGINE_CONFIG_FOLDER);
+  public String getAppEngineDirectory() {
+    return preferenceStore.get(PREF_APP_ENGINE_DIRECTORY,
+        FlexDeployPreferenceInitializer.DEFAULT_APP_ENGINE_DIRECTORY);
   }
 
-  public void setAppEngineConfigFolder(String appEngineConfigFolder) {
-    preferenceStore.put(PREF_APP_ENGINE_CONFIG_FOLDER, appEngineConfigFolder);
+  public void setAppEngineDirectory(String AppEngineDirectory) {
+    preferenceStore.put(PREF_APP_ENGINE_DIRECTORY, AppEngineDirectory);
   }
   
-  public String getDockerFileLocation() {
-    return preferenceStore.get(PREF_DOCKER_FILE_LOCATION,
-        FlexDeployPreferenceInitializer.DEFAULT_DOCKER_FILE_LOCATION);
+  public String getDockerDirectory() {
+    return preferenceStore.get(PREF_DOCKER_DIRECTORY,
+        FlexDeployPreferenceInitializer.DEFAULT_DOCKER_DIRECTORY);
   }
 
-  public void setDockerFileLocation(String dockerFileLocation) {
-    preferenceStore.put(PREF_DOCKER_FILE_LOCATION, dockerFileLocation);
+  public void setDockerDirectory(String DockerDirectory) {
+    preferenceStore.put(PREF_DOCKER_DIRECTORY, DockerDirectory);
   }
 
   public boolean getUseDeploymentPreferences() {
