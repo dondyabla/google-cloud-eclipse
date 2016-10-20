@@ -52,6 +52,7 @@ public class FlexDeployPreferencesPanel extends DeployPreferencesPanel {
 
   @Override
   public DataBindingContext getDataBindingContext() {
+    // provides default validation status
     return new DataBindingContext();
   }
 
