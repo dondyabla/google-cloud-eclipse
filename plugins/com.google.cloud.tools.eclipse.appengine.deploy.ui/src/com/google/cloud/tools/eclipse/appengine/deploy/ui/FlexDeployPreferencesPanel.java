@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.eclipse.appengine.deploy.ui;
 
+import com.google.cloud.tools.eclipse.appengine.deploy.flex.FlexDeployPreferences;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -29,8 +30,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
-
-import com.google.cloud.tools.eclipse.appengine.deploy.flex.FlexDeployPreferences;
 
 public class FlexDeployPreferencesPanel extends DeployPreferencesPanel {
   private static final int LINKED_CHILD_INDENT = 10;

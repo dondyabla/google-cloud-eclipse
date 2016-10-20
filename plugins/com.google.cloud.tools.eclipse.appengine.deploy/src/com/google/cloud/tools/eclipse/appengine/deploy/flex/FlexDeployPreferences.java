@@ -21,8 +21,6 @@ import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.osgi.service.prefs.BackingStoreException;
 
-import com.google.common.annotations.VisibleForTesting;
-
 public class FlexDeployPreferences {
   public static final String PREFERENCE_STORE_QUALIFIER = "com.google.cloud.tools.eclipse.appengine.deploy.flex";
   public static final FlexDeployPreferences DEFAULT;

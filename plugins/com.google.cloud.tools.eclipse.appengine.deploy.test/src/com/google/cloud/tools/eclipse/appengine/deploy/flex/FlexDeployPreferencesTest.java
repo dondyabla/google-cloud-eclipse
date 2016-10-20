@@ -44,7 +44,7 @@ public class FlexDeployPreferencesTest {
 
   @Test
   public void testDefaultDockerFileLocation() {
-    assertThat(FlexDeployPreferences.DEFAULT.getAppEngineConfigFolder(), isEmptyString());
+    assertThat(FlexDeployPreferences.DEFAULT.getDockerFileLocation(), isEmptyString());
   }
 
   @Test
