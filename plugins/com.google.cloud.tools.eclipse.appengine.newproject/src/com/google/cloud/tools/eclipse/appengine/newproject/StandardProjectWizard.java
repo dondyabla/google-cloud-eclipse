@@ -42,12 +42,10 @@ public class StandardProjectWizard extends Wizard implements INewWizard {
 
   private WizardPage page;
   private AppEngineStandardProjectConfig config = new AppEngineStandardProjectConfig();
-  private boolean hasAppEngineComponent;
 
   public StandardProjectWizard() {
     this.setWindowTitle("New App Engine Standard Project");
-    hasAppEngineComponent = doesAppEngineJavaComponentExist();
-    if (hasAppEngineComponent) {
+    if (doesAppEngineJavaComponentExist()) {
       page = new AppEngineStandardWizardPage();
     } else {
       page = new AppEngineComponentPage();

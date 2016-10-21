@@ -16,6 +16,9 @@
 
 package com.google.cloud.tools.eclipse.appengine.newproject.maven;
 
+import com.google.cloud.tools.appengine.cloudsdk.AppEngineJavaComponentsNotInstalledException;
+import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
+import com.google.cloud.tools.eclipse.appengine.ui.AppEngineComponentPage;
 import com.google.cloud.tools.eclipse.usagetracker.AnalyticsEvents;
 import com.google.cloud.tools.eclipse.usagetracker.AnalyticsPingManager;
 
@@ -42,10 +45,14 @@ public class MavenArchetypeProjectWizard extends Wizard implements INewWizard {
 
   @Override
   public void addPages() {
-    page = new MavenAppEngineStandardWizardPage();
-    archetypePage = new MavenAppEngineStandardArchetypeWizardPage();
-    this.addPage(page);
-    this.addPage(archetypePage);
+    if (doesAppEngineJavaComponentExist()) {
+      page = new MavenAppEngineStandardWizardPage();
+      archetypePage = new MavenAppEngineStandardArchetypeWizardPage();
+      this.addPage(page);
+      this.addPage(archetypePage);
+    } else {
+      this.addPage(new AppEngineComponentPage());
+    }
   }
 
   @Override
@@ -89,4 +96,13 @@ public class MavenArchetypeProjectWizard extends Wizard implements INewWizard {
 
   @Override
   public void init(IWorkbench workbench, IStructuredSelection selection) {}
+
+  private boolean doesAppEngineJavaComponentExist() {
+    try {
+      new CloudSdk.Builder().build().validateAppEngineJavaComponents();
+      return true;
+    } catch (AppEngineJavaComponentsNotInstalledException ex) {
+      return false;
+    }
+  }
 }
