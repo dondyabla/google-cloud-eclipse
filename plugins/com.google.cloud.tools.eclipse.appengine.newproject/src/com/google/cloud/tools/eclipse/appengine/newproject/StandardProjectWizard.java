@@ -53,7 +53,7 @@ public class StandardProjectWizard extends Wizard implements INewWizard {
       page = new AppEngineStandardWizardPage();
       this.addPage(page);
     } else {
-      this.addPage(new AppEngineComponentPage());
+      this.addPage(new AppEngineComponentPage(true /* forNativeProjectWizard */));
     }
   }
 

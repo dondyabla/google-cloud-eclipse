@@ -51,7 +51,7 @@ public class MavenArchetypeProjectWizard extends Wizard implements INewWizard {
       this.addPage(page);
       this.addPage(archetypePage);
     } else {
-      this.addPage(new AppEngineComponentPage());
+      this.addPage(new AppEngineComponentPage(false /* forNativeProjectWizard */));
     }
   }
 

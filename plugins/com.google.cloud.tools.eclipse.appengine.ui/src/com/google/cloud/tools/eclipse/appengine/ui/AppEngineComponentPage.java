@@ -32,11 +32,13 @@ import com.google.cloud.tools.eclipse.usagetracker.AnalyticsPingManager;
  * with instructions on how to install it. This page disables the 'Finish' button.
  */
 public class AppEngineComponentPage extends WizardPage {
+  private boolean forNativeProjectWizard;
 
-  public AppEngineComponentPage() {
+  public AppEngineComponentPage(boolean forNativeProjectWizard) {
     super("appEngineComponentPage");
     setTitle("App Engine Component is missing");
     setDescription("The Cloud SDK App Engine Java component is not installed"); 
+    this.forNativeProjectWizard = forNativeProjectWizard;
   }
 
   @Override
@@ -44,7 +46,9 @@ public class AppEngineComponentPage extends WizardPage {
     AnalyticsPingManager.getInstance().sendPing(
         AnalyticsEvents.APP_ENGINE_NEW_PROJECT_WIZARD,
         AnalyticsEvents.APP_ENGINE_NEW_PROJECT_WIZARD_TYPE,
-        AnalyticsEvents.APP_ENGINE_NEW_PROJECT_WIZARD_TYPE_NATIVE, parent.getShell());
+        forNativeProjectWizard ? AnalyticsEvents.APP_ENGINE_NEW_PROJECT_WIZARD_TYPE_NATIVE :
+          AnalyticsEvents.APP_ENGINE_NEW_PROJECT_WIZARD_TYPE_MAVEN,
+          parent.getShell());
 
     Composite container = new Composite(parent, SWT.NONE);
     GridLayoutFactory.swtDefaults().numColumns(1).applyTo(container);
