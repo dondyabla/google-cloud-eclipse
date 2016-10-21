@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.eclipse.appengine.newproject;
+package com.google.cloud.tools.eclipse.appengine.ui;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -24,7 +24,6 @@ import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
-
 import com.google.cloud.tools.eclipse.usagetracker.AnalyticsEvents;
 import com.google.cloud.tools.eclipse.usagetracker.AnalyticsPingManager;
 
@@ -34,7 +33,7 @@ import com.google.cloud.tools.eclipse.usagetracker.AnalyticsPingManager;
  */
 public class AppEngineComponentPage extends WizardPage {
 
-  protected AppEngineComponentPage() {
+  public AppEngineComponentPage() {
     super("appEngineComponentPage");
     setTitle("App Engine Component is missing");
     setDescription("The Cloud SDK App Engine Java component is not installed"); 

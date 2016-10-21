@@ -18,6 +18,7 @@ package com.google.cloud.tools.eclipse.appengine.newproject;
 
 import com.google.cloud.tools.appengine.cloudsdk.AppEngineJavaComponentsNotInstalledException;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
+import com.google.cloud.tools.eclipse.appengine.ui.AppEngineComponentPage;
 import com.google.cloud.tools.eclipse.sdk.ui.preferences.CloudSdkPrompter;
 import com.google.cloud.tools.eclipse.usagetracker.AnalyticsEvents;
 import com.google.cloud.tools.eclipse.usagetracker.AnalyticsPingManager;
