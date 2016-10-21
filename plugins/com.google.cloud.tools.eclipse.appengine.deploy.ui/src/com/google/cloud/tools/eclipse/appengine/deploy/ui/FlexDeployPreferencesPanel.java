@@ -17,8 +17,11 @@
 package com.google.cloud.tools.eclipse.appengine.deploy.ui;
 
 import com.google.cloud.tools.eclipse.appengine.deploy.flex.FlexDeployPreferences;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
@@ -30,9 +33,13 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.osgi.service.prefs.BackingStoreException;
 
 public class FlexDeployPreferencesPanel extends DeployPreferencesPanel {
   private static final int LINKED_CHILD_INDENT = 10;
+
+  private static Logger logger = Logger.getLogger(DeployPropertyPage.class.getName());
+
   private FlexDeployPreferences preferences;
   private Button useValuesButton;
   private Label gaeConfigFolderLabel;
@@ -65,7 +72,17 @@ public class FlexDeployPreferencesPanel extends DeployPreferencesPanel {
     preferences.setUseDeploymentPreferences(useValuesButton.getSelection());
     preferences.setAppEngineDirectory(gaeConfigFolderText.getText().trim());
     preferences.setDockerDirectory(dockerFileText.getText().trim());
-    return true;
+    try {
+      preferences.save();
+      return true;
+    } catch (BackingStoreException ex) {
+      logger.log(Level.SEVERE, "Could not save deploy preferences", ex);
+      MessageDialog.openError(getShell(),
+                              Messages.getString("deploy.preferences.save.error.title"),
+                              Messages.getString("deploy.preferences.save.error.message",
+                                                 ex.getLocalizedMessage()));
+      return false;
+    }
   }
 
   private void createConfigurationFilesSection() {
