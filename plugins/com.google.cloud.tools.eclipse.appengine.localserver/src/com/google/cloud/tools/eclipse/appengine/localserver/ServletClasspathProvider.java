@@ -59,6 +59,9 @@ public class ServletClasspathProvider extends RuntimeClasspathProviderDelegate {
 
   private IEclipseContext eclipseContextForTesting;
 
+  public ServletClasspathProvider() {
+  }
+
   @VisibleForTesting
   ServletClasspathProvider(Map<String, Library> libraries, IEclipseContext eclipseContextForTesting) {
     this.libraries = libraries;

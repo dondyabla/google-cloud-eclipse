@@ -25,7 +25,6 @@ import static org.mockito.Mockito.when;
 import com.google.cloud.tools.eclipse.appengine.libraries.LibraryClasspathContainer;
 import com.google.cloud.tools.eclipse.appengine.libraries.persistence.LibraryClasspathContainerSerializer.LibraryContainerStateLocationProvider;
 import com.google.common.base.Charsets;
-import com.google.common.base.Joiner;
 import com.google.gson.JsonParser;
 import java.io.FileReader;
 import java.io.IOException;
