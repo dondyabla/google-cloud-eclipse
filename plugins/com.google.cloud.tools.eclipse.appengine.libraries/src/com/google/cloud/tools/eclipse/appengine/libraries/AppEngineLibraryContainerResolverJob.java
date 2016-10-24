@@ -113,10 +113,10 @@ public class AppEngineLibraryContainerResolverJob extends Job {
     return Status.OK_STATUS;
   }
 
-  private LibraryClasspathContainer resolveLibraryFiles(final IClasspathEntry classpathEntry,
-                                                        final Library library,
-                                                        final IProgressMonitor monitor)
-                                                            throws LibraryRepositoryServiceException {
+  private LibraryClasspathContainer resolveLibraryFiles(IClasspathEntry classpathEntry,
+                                                        Library library,
+                                                        IProgressMonitor monitor)
+                                                                              throws LibraryRepositoryServiceException {
     List<LibraryFile> libraryFiles = library.getLibraryFiles();
     SubMonitor subMonitor = SubMonitor.convert(monitor, libraryFiles.size());
     subMonitor.subTask(NLS.bind(Messages.TaskResolveArtifacts, getLibraryDescription(library)));
