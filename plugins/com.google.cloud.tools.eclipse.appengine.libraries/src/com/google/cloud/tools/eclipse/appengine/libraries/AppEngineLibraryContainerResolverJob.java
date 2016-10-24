@@ -116,7 +116,7 @@ public class AppEngineLibraryContainerResolverJob extends Job {
   private LibraryClasspathContainer resolveLibraryFiles(IClasspathEntry classpathEntry,
                                                         Library library,
                                                         IProgressMonitor monitor)
-                                                                              throws LibraryRepositoryServiceException {
+                                                            throws LibraryRepositoryServiceException {
     List<LibraryFile> libraryFiles = library.getLibraryFiles();
     SubMonitor subMonitor = SubMonitor.convert(monitor, libraryFiles.size());
     subMonitor.subTask(NLS.bind(Messages.TaskResolveArtifacts, getLibraryDescription(library)));
@@ -167,9 +167,5 @@ public class AppEngineLibraryContainerResolverJob extends Job {
         logger.log(Level.SEVERE, "Failed to initialize libraries", exception); //$NON-NLS-1$
       }
     }
-  }
-
-  public void setProject(IJavaProject javaProject) {
-    this.javaProject = javaProject;
   }
 }
