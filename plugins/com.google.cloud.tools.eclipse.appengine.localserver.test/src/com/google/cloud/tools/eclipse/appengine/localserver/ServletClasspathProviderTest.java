@@ -16,6 +16,8 @@
 
 package com.google.cloud.tools.eclipse.appengine.localserver;
 
+import static org.junit.Assert.assertNull;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -41,20 +43,19 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ServletClasspathProviderTest {
 
-  private ServletClasspathProvider provider = new ServletClasspathProvider();
+  private ServletClasspathProvider provider;
   @Mock private ILibraryRepositoryService repositoryService;
-  @Rule public TestEclipseContext eclipseContext = new TestEclipseContext(getClass());
+  @Rule public TestEclipseContext eclipseContext = new TestEclipseContext();
   
   @Before
   public void setUp() throws LibraryRepositoryServiceException {
+    eclipseContext.set(ILibraryRepositoryService.class, repositoryService);
     Library servletApi = getMockApi("servlet-api");
     Library jspApi = getMockApi("jsp-api");
     HashMap<String, Library> libraries = new HashMap<>();
     libraries.put("servlet-api", servletApi);
     libraries.put("jsp-api", jspApi);
-    provider.setLibraries(libraries);
-    eclipseContext.set(ILibraryRepositoryService.class, repositoryService);
-    provider.setEclipseContextForTesting(eclipseContext.getContext());
+    provider = new ServletClasspathProvider(libraries, eclipseContext.getContext());
   }
 
   @Test
@@ -65,12 +66,18 @@ public class ServletClasspathProviderTest {
   }
 
   @Test
+  public void testResolveClasspathContainerThrowsError() throws LibraryRepositoryServiceException {
+    when(repositoryService.getLibraryClasspathEntry(any(LibraryFile.class)))
+      .thenThrow(new LibraryRepositoryServiceException("test exception"));
+    assertNull(provider.resolveClasspathContainer(null, null));
+  }
+
+  @Test
   public void testResolveClasspathContainer_mavenProject() throws CoreException {
     IProject project = Mockito.mock(IProject.class);
     Mockito.when(project.hasNature("org.eclipse.m2e.core.maven2Nature")).thenReturn(true);
     Mockito.when(project.isAccessible()).thenReturn(true);
-    IClasspathEntry[] result = provider.resolveClasspathContainer(project, null);
-    Assert.assertEquals(0, result.length);
+    Assert.assertNull(provider.resolveClasspathContainer(project, null));
   }
 
   private Library getMockApi(String libraryId) throws LibraryRepositoryServiceException {

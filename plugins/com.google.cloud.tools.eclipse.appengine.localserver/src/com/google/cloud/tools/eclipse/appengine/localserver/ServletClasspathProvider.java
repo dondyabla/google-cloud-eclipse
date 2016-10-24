@@ -58,12 +58,8 @@ public class ServletClasspathProvider extends RuntimeClasspathProviderDelegate {
   private IEclipseContext eclipseContextForTesting;
 
   @VisibleForTesting
-  void setLibraries(Map<String, Library> libraries) {
+  ServletClasspathProvider(Map<String, Library> libraries, IEclipseContext eclipseContextForTesting) {
     this.libraries = libraries;
-  }
-
-  @VisibleForTesting
-  void setEclipseContextForTesting(IEclipseContext eclipseContextForTesting) {
     this.eclipseContextForTesting = eclipseContextForTesting;
   }
 
@@ -114,6 +110,8 @@ public class ServletClasspathProvider extends RuntimeClasspathProviderDelegate {
     }
   }
 
+  // TODO parse library definition in ILibraryConfigService (or similar) started when the plugin/bundle starts
+  // https://github.com/GoogleCloudPlatform/google-cloud-eclipse/issues/856
   private void initializeLibraries(IConfigurationElement[] configurationElements, LibraryFactory libraryFactory) {
     if (libraries == null) {
       libraries = new HashMap<>(configurationElements.length);

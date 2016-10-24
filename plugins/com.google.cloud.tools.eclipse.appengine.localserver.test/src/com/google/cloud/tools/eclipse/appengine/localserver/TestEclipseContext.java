@@ -19,20 +19,14 @@ package com.google.cloud.tools.eclipse.appengine.localserver;
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.junit.rules.ExternalResource;
-import org.osgi.framework.FrameworkUtil;
 
 public class TestEclipseContext extends ExternalResource {
 
-  private Class<?> testClass;
   private IEclipseContext eclipseContext;
-
-  public TestEclipseContext(Class<?> testClass) {
-    this.testClass = testClass;
-  }
 
   @Override
   protected void before() throws Throwable {
-    eclipseContext = EclipseContextFactory.createServiceContext(FrameworkUtil.getBundle(testClass).getBundleContext());
+    eclipseContext = EclipseContextFactory.create();
   }
 
   @Override

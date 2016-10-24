@@ -100,6 +100,8 @@ public class AppEngineLibraryContainerInitializer extends ClasspathContainerInit
     }
   }
 
+  // TODO parse library definition in ILibraryConfigService (or similar) started when the plugin/bundle starts
+  // https://github.com/GoogleCloudPlatform/google-cloud-eclipse/issues/856
   private void initializeLibraries(IConfigurationElement[] configurationElements, LibraryFactory libraryFactory) {
     libraries = new HashMap<>(configurationElements.length);
     for (IConfigurationElement configurationElement : configurationElements) {
