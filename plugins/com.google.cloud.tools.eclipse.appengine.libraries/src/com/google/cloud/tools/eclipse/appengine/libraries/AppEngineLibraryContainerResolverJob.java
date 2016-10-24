@@ -58,8 +58,9 @@ public class AppEngineLibraryContainerResolverJob extends Job {
 
   private Map<String, Library> libraries;
   private LibraryClasspathContainerSerializer serializer;
-  private IJavaProject javaProject;
 
+  @Inject
+  private IJavaProject javaProject;
   @Inject
   private ILibraryRepositoryService repositoryService;
 
@@ -115,23 +116,23 @@ public class AppEngineLibraryContainerResolverJob extends Job {
   private LibraryClasspathContainer resolveLibraryFiles(final IClasspathEntry classpathEntry,
                                                         final Library library,
                                                         final IProgressMonitor monitor)
-                                                                              throws LibraryRepositoryServiceException {
-          List<LibraryFile> libraryFiles = library.getLibraryFiles();
-          SubMonitor subMonitor = SubMonitor.convert(monitor, libraryFiles.size());
-          subMonitor.subTask(NLS.bind(Messages.TaskResolveArtifacts, getLibraryDescription(library)));
-          SubMonitor child = subMonitor.newChild(libraryFiles.size());
+                                                            throws LibraryRepositoryServiceException {
+    List<LibraryFile> libraryFiles = library.getLibraryFiles();
+    SubMonitor subMonitor = SubMonitor.convert(monitor, libraryFiles.size());
+    subMonitor.subTask(NLS.bind(Messages.TaskResolveArtifacts, getLibraryDescription(library)));
+    SubMonitor child = subMonitor.newChild(libraryFiles.size());
 
-          IClasspathEntry[] entries = new IClasspathEntry[libraryFiles.size()];
-          int idx = 0;
-          for (LibraryFile libraryFile : libraryFiles) {
-            entries[idx++] = repositoryService.getLibraryClasspathEntry(libraryFile);
-            child.worked(1);
-          }
-          monitor.done();
-          LibraryClasspathContainer container = new LibraryClasspathContainer(classpathEntry.getPath(),
-                                                                              getLibraryDescription(library),
-                                                                              entries);
-          return container;
+    IClasspathEntry[] entries = new IClasspathEntry[libraryFiles.size()];
+    int idx = 0;
+    for (LibraryFile libraryFile : libraryFiles) {
+      entries[idx++] = repositoryService.getLibraryClasspathEntry(libraryFile);
+      child.worked(1);
+    }
+    monitor.done();
+    LibraryClasspathContainer container = new LibraryClasspathContainer(classpathEntry.getPath(),
+                                                                        getLibraryDescription(library),
+                                                                        entries);
+    return container;
   }
 
   private static int getTotalwork(IClasspathEntry[] rawClasspath) {
