@@ -49,7 +49,7 @@ public class StandardProjectWizard extends Wizard implements INewWizard {
 
   @Override
   public void addPages() {
-    if (doesAppEngineJavaComponentExist()) {
+    if (appEngineJavaComponentExists()) {
       page = new AppEngineStandardWizardPage();
       this.addPage(page);
     } else {
@@ -114,7 +114,7 @@ public class StandardProjectWizard extends Wizard implements INewWizard {
   public void init(IWorkbench workbench, IStructuredSelection selection) {
   }
 
-  private boolean doesAppEngineJavaComponentExist() {
+  private boolean appEngineJavaComponentExists() {
     try {
       new CloudSdk.Builder().build().validateAppEngineJavaComponents();
       return true;

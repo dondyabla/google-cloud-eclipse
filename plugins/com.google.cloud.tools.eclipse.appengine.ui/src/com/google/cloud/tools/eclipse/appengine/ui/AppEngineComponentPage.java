@@ -43,12 +43,19 @@ public class AppEngineComponentPage extends WizardPage {
 
   @Override
   public void createControl(Composite parent) {
-    AnalyticsPingManager.getInstance().sendPing(
-        AnalyticsEvents.APP_ENGINE_NEW_PROJECT_WIZARD,
-        AnalyticsEvents.APP_ENGINE_NEW_PROJECT_WIZARD_TYPE,
-        forNativeProjectWizard ? AnalyticsEvents.APP_ENGINE_NEW_PROJECT_WIZARD_TYPE_NATIVE :
+    if (forNativeProjectWizard) {
+      AnalyticsPingManager.getInstance().sendPing(
+          AnalyticsEvents.APP_ENGINE_NEW_PROJECT_WIZARD,
+          AnalyticsEvents.APP_ENGINE_NEW_PROJECT_WIZARD_TYPE,
+          AnalyticsEvents.APP_ENGINE_NEW_PROJECT_WIZARD_TYPE_NATIVE,
+          parent.getShell());
+    } else {
+      AnalyticsPingManager.getInstance().sendPing(
+          AnalyticsEvents.APP_ENGINE_NEW_PROJECT_WIZARD,
+          AnalyticsEvents.APP_ENGINE_NEW_PROJECT_WIZARD_TYPE,
           AnalyticsEvents.APP_ENGINE_NEW_PROJECT_WIZARD_TYPE_MAVEN,
           parent.getShell());
+    }
 
     Composite container = new Composite(parent, SWT.NONE);
     GridLayoutFactory.swtDefaults().numColumns(1).applyTo(container);

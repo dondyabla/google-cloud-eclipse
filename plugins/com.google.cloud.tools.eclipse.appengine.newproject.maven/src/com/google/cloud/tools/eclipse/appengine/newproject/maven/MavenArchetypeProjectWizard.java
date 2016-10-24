@@ -45,7 +45,7 @@ public class MavenArchetypeProjectWizard extends Wizard implements INewWizard {
 
   @Override
   public void addPages() {
-    if (doesAppEngineJavaComponentExist()) {
+    if (appEngineJavaComponentExists()) {
       page = new MavenAppEngineStandardWizardPage();
       archetypePage = new MavenAppEngineStandardArchetypeWizardPage();
       this.addPage(page);
@@ -97,7 +97,7 @@ public class MavenArchetypeProjectWizard extends Wizard implements INewWizard {
   @Override
   public void init(IWorkbench workbench, IStructuredSelection selection) {}
 
-  private boolean doesAppEngineJavaComponentExist() {
+  private boolean appEngineJavaComponentExists() {
     try {
       new CloudSdk.Builder().build().validateAppEngineJavaComponents();
       return true;
