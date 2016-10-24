@@ -16,34 +16,45 @@
 
 package com.google.cloud.tools.eclipse.appengine.localserver;
 
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
-
+import com.google.cloud.tools.eclipse.appengine.libraries.model.Library;
+import com.google.cloud.tools.eclipse.appengine.libraries.model.LibraryFile;
+import com.google.cloud.tools.eclipse.appengine.libraries.repository.ILibraryRepositoryService;
+import com.google.cloud.tools.eclipse.appengine.libraries.repository.LibraryRepositoryServiceException;
+import java.util.Collections;
+import java.util.HashMap;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.nio.file.Paths;
-
 @RunWith(MockitoJUnitRunner.class)
 public class ServletClasspathProviderTest {
 
   private ServletClasspathProvider provider = new ServletClasspathProvider();
-  @Mock private CloudSdk cloudSdk;
+  @Mock private ILibraryRepositoryService repositoryService;
+  @Rule public TestEclipseContext eclipseContext = new TestEclipseContext(getClass());
   
   @Before
-  public void setUp() {
-    when(cloudSdk.getJarPath("servlet-api.jar")).thenReturn(Paths.get("/path/to/servlet-api.jar"));
-    when(cloudSdk.getJarPath("jsp-api.jar")).thenReturn(Paths.get("/path/to/jsp-api.jar"));
-    provider.setCloudSdk(cloudSdk);
+  public void setUp() throws LibraryRepositoryServiceException {
+    Library servletApi = getMockApi("servlet-api");
+    Library jspApi = getMockApi("jsp-api");
+    HashMap<String, Library> libraries = new HashMap<>();
+    libraries.put("servlet-api", servletApi);
+    libraries.put("jsp-api", jspApi);
+    provider.setLibraries(libraries);
+    eclipseContext.set(ILibraryRepositoryService.class, repositoryService);
+    provider.setEclipseContextForTesting(eclipseContext.getContext());
   }
 
   @Test
@@ -62,4 +73,13 @@ public class ServletClasspathProviderTest {
     Assert.assertEquals(0, result.length);
   }
 
+  private Library getMockApi(String libraryId) throws LibraryRepositoryServiceException {
+    Library servletApi = new Library(libraryId);
+    LibraryFile libraryFile = mock(LibraryFile.class);
+    servletApi.setLibraryFiles(Collections.singletonList(libraryFile));
+    IClasspathEntry classpathEntry = mock(IClasspathEntry.class);
+    when(classpathEntry.getPath()).thenReturn(new Path("/path/to/" + libraryId + ".jar"));
+    when(repositoryService.getLibraryClasspathEntry(libraryFile)).thenReturn(classpathEntry);
+    return servletApi;
+  }
 }
