@@ -45,6 +45,8 @@ import org.osgi.framework.FrameworkUtil;
 /**
  * Supply Java standard classes, specifically servlet-api.jar and jsp-api.jar,
  * to non-Maven projects.
+ * <p>
+ * The jars are resolved using {@link ILibraryRepositoryService}.
  */
 public class ServletClasspathProvider extends RuntimeClasspathProviderDelegate {
 
@@ -104,7 +106,7 @@ public class ServletClasspathProvider extends RuntimeClasspathProviderDelegate {
 
   private IEclipseContext getEclipseContext() {
     if (eclipseContextForTesting == null) {
-      return EclipseContextFactory.createServiceContext(FrameworkUtil.getBundle(getClass()).getBundleContext());
+      return EclipseContextFactory.getServiceContext(FrameworkUtil.getBundle(getClass()).getBundleContext());
     } else {
       return eclipseContextForTesting;
     }

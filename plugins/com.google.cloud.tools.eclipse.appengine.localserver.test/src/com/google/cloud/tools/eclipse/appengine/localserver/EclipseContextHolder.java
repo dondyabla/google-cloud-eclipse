@@ -18,9 +18,20 @@ package com.google.cloud.tools.eclipse.appengine.localserver;
 
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.junit.Rule;
 import org.junit.rules.ExternalResource;
 
-public class TestEclipseContext extends ExternalResource {
+/**
+ * Helper class to be used with {@link Rule} to make tests easier that depend on {@link IEclipseContext}. It provides
+ * an empty context that can be filled with object needed for the test using the {@link #set(Class, Object)} method.
+ * <p>
+ * Creates a new context instance for each test runs and takes care of the disposal of the context object after
+ * the test has been executed.
+ * <p>
+ * Mocking the {@link IEclipseContext} objects can be complicated hence this class. mock(IEclipseContext.class) causes
+ * ClassCastException, mock(EclipseContext.class) throws an error during service lookup.
+ */
+public class EclipseContextHolder extends ExternalResource {
 
   private IEclipseContext eclipseContext;
 
@@ -36,10 +47,16 @@ public class TestEclipseContext extends ExternalResource {
     }
   }
 
+  /**
+   * Calls {@link IEclipseContext#set(Class, Object)} on the underlying context object.
+   */
   public <T> void set(Class<T> clazz, T value) {
     eclipseContext.set(clazz, value);
   }
 
+  /**
+   * @return the underlying {@link IEclipseContext} instance 
+   */
   public IEclipseContext getContext() {
     return eclipseContext;
   }
