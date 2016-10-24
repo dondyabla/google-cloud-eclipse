@@ -52,7 +52,7 @@ public class AppEngineLibrariesInPluginXmlTest {
   private static final String JSP_API_LIBRARY_ID = "jsp-api";
 
   @Test
-  public void testThereAreOnlyFiveLibraries() {
+  public void testThereAreExactlyFiveLibraries() {
     IConfigurationElement[] configurationElements =
         RegistryFactory.getRegistry()
           .getConfigurationElementsFor(AppEngineLibraryContainerInitializer.LIBRARIES_EXTENSION_POINT);
