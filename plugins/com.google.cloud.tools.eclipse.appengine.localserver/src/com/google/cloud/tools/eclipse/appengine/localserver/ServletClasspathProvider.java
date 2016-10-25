@@ -60,8 +60,9 @@ public class ServletClasspathProvider extends RuntimeClasspathProviderDelegate {
   }
 
   @VisibleForTesting
-  ServletClasspathProvider(Map<String, Library> libraries, IEclipseContext eclipseContextForTesting) {
+  ServletClasspathProvider(Map<String, Library> libraries, ILibraryRepositoryService repositoryService) {
     this.libraries = libraries;
+    service = repositoryService;
   }
 
   @Override
@@ -76,9 +77,7 @@ public class ServletClasspathProvider extends RuntimeClasspathProviderDelegate {
   @Override
   public IClasspathEntry[] resolveClasspathContainer(IRuntime runtime) {
     try {
-      IConfigurationElement[] configurationElements =
-          extensionRegistry.getConfigurationElementsFor("com.google.cloud.tools.eclipse.appengine.libraries");
-      initializeLibraries(configurationElements, new LibraryFactory());
+      initializeLibraries(new LibraryFactory());
 
       // servlet api is assumed to be a single file
       List<LibraryFile> servletApiLibraryFiles = libraries.get("servlet-api").getLibraryFiles();
@@ -100,8 +99,10 @@ public class ServletClasspathProvider extends RuntimeClasspathProviderDelegate {
 
   // TODO parse library definition in ILibraryConfigService (or similar) started when the plugin/bundle starts
   // https://github.com/GoogleCloudPlatform/google-cloud-eclipse/issues/856
-  private void initializeLibraries(IConfigurationElement[] configurationElements, LibraryFactory libraryFactory) {
+  private void initializeLibraries(LibraryFactory libraryFactory) {
     if (libraries == null) {
+      IConfigurationElement[] configurationElements =
+          extensionRegistry.getConfigurationElementsFor("com.google.cloud.tools.eclipse.appengine.libraries");
       libraries = new HashMap<>(configurationElements.length);
       for (IConfigurationElement configurationElement : configurationElements) {
         try {
