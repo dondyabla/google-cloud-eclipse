@@ -30,7 +30,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
 import com.google.cloud.tools.eclipse.appengine.libraries.model.Library;
-import com.google.cloud.tools.eclipse.appengine.ui.AddManageLibrariesGroup;
+import com.google.cloud.tools.eclipse.appengine.ui.AppEngineLibrariesSelectorGroup;
 import com.google.cloud.tools.eclipse.appengine.ui.AppEngineImages;
 import com.google.cloud.tools.eclipse.usagetracker.AnalyticsEvents;
 import com.google.cloud.tools.eclipse.usagetracker.AnalyticsPingManager;
@@ -41,7 +41,7 @@ import com.google.cloud.tools.eclipse.usagetracker.AnalyticsPingManager;
 public class AppEngineStandardWizardPage extends WizardNewProjectCreationPage {
 
   private Text javaPackageField;
-  private AddManageLibrariesGroup addManageLibrariesGroup;
+  private AppEngineLibrariesSelectorGroup addManageLibrariesGroup;
 
   public AppEngineStandardWizardPage() {
     super("basicNewProjectPage"); //$NON-NLS-1$
@@ -76,7 +76,7 @@ public class AppEngineStandardWizardPage extends WizardNewProjectCreationPage {
     javaPackageField.addModifyListener(pageValidator);
 
     // Manage APIs
-    addManageLibrariesGroup = new AddManageLibrariesGroup(this, container);
+    addManageLibrariesGroup = new AppEngineLibrariesSelectorGroup(this, container);
 
     Dialog.applyDialogFont(container);
   }

@@ -42,22 +42,21 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 
-public class AddManageLibrariesGroup {
+public class AppEngineLibrariesSelectorGroup {
   private DialogPage parentDialog;
   private Composite parentContainer;
   private List<Button> libraryButtons = new LinkedList<>();
   private DataBindingContext bindingContext;
 
-  public AddManageLibrariesGroup(DialogPage parentDialog, Composite parentContainer) {
+  public AppEngineLibrariesSelectorGroup(DialogPage parentDialog, Composite parentContainer) {
     Preconditions.checkNotNull(parentDialog, "parentDialog is null");
     Preconditions.checkNotNull(parentContainer, "parentContainer is null");
 
     this.parentDialog = parentDialog;
     this.parentContainer = parentContainer;
-    createAddManageLibrariesGroup();
+    createContents();
   }
 
-  
   public List<Library> getSelectedLibraries() {
     List<Library> selected = new LinkedList<>();
     for (Button button : libraryButtons) {
@@ -68,7 +67,7 @@ public class AddManageLibrariesGroup {
     return selected;
   }
 
-  private void createAddManageLibrariesGroup() {
+  private void createContents() {
     Group apiGroup = new Group(parentContainer, SWT.NONE);
     apiGroup.setText(Messages.AppEngineStandardWizardPage_librariesGroupLabel);
     GridDataFactory.fillDefaults().span(2, 1).applyTo(apiGroup);
@@ -85,7 +84,7 @@ public class AddManageLibrariesGroup {
 
     GridLayoutFactory.fillDefaults().applyTo(apiGroup);
   }
-  
+
   // TODO obtain libraries from extension registry
   // https://github.com/GoogleCloudPlatform/google-cloud-eclipse/issues/819
   private List<Library> getLibraries() {
@@ -104,7 +103,7 @@ public class AddManageLibrariesGroup {
       return library.getId();
     }
   }
-  
+
   private void addDatabindingForDependencies() {
     bindingContext = new DataBindingContext();
     for (Button libraryButton : libraryButtons) {
@@ -135,7 +134,7 @@ public class AddManageLibrariesGroup {
       }
     }
   }
-  
+
   private Button getButtonForLibraryId(String libraryId) {
     for (Button button : libraryButtons) {
       Library library = (Library) button.getData();
@@ -145,11 +144,10 @@ public class AddManageLibrariesGroup {
     }
     return null;
   }
-  
+
   private Realm getDisplayRealm() {
     return DisplayRealm.getRealm(parentDialog.getControl().getDisplay()); 
   }
-
 
   public void dispose() {
     if (bindingContext != null) {
