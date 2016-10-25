@@ -69,7 +69,7 @@ public class AppEngineLibrariesSelectorGroup {
 
   private void createContents() {
     Group apiGroup = new Group(parentContainer, SWT.NONE);
-    apiGroup.setText(Messages.AppEngineStandardWizardPage_librariesGroupLabel);
+    apiGroup.setText(Messages.AppEngineLibrariesSelectorGroupLabel);
     GridDataFactory.fillDefaults().span(2, 1).applyTo(apiGroup);
 
     List<Library> libraries = getLibraries();

@@ -20,7 +20,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
   private static final String BUNDLE_NAME = "com.google.cloud.tools.eclipse.appengine.ui.messages"; //$NON-NLS-1$
-  public static String AppEngineStandardWizardPage_librariesGroupLabel;
+  public static String AppEngineLibrariesSelectorGroupLabel;
 
   static {
     // initialize resource bundle
