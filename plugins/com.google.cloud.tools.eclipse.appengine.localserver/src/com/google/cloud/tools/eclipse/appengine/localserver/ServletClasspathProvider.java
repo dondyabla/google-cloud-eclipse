@@ -33,14 +33,11 @@ import java.util.logging.Logger;
 import javax.inject.Inject;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.RegistryFactory;
-import org.eclipse.e4.core.contexts.ContextInjectionFactory;
-import org.eclipse.e4.core.contexts.EclipseContextFactory;
+import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jst.server.core.RuntimeClasspathProviderDelegate;
 import org.eclipse.wst.server.core.IRuntime;
-import org.osgi.framework.FrameworkUtil;
 
 /**
  * Supply Java standard classes, specifically servlet-api.jar and jsp-api.jar,
@@ -56,8 +53,8 @@ public class ServletClasspathProvider extends RuntimeClasspathProviderDelegate {
 
   @Inject
   private ILibraryRepositoryService service;
-
-  private IEclipseContext eclipseContextForTesting;
+  @Inject
+  private IExtensionRegistry extensionRegistry;
 
   public ServletClasspathProvider() {
   }
@@ -65,7 +62,6 @@ public class ServletClasspathProvider extends RuntimeClasspathProviderDelegate {
   @VisibleForTesting
   ServletClasspathProvider(Map<String, Library> libraries, IEclipseContext eclipseContextForTesting) {
     this.libraries = libraries;
-    this.eclipseContextForTesting = eclipseContextForTesting;
   }
 
   @Override
@@ -79,12 +75,9 @@ public class ServletClasspathProvider extends RuntimeClasspathProviderDelegate {
 
   @Override
   public IClasspathEntry[] resolveClasspathContainer(IRuntime runtime) {
-    IEclipseContext context = getEclipseContext();
     try {
-      ContextInjectionFactory.inject(this, context);
-
       IConfigurationElement[] configurationElements =
-          RegistryFactory.getRegistry().getConfigurationElementsFor("com.google.cloud.tools.eclipse.appengine.libraries");
+          extensionRegistry.getConfigurationElementsFor("com.google.cloud.tools.eclipse.appengine.libraries");
       initializeLibraries(configurationElements, new LibraryFactory());
 
       // servlet api is assumed to be a single file
@@ -102,16 +95,6 @@ public class ServletClasspathProvider extends RuntimeClasspathProviderDelegate {
       return new IClasspathEntry[] { servletApiEntry, jspApiEntry };
     } catch (LibraryRepositoryServiceException e) {
       return null;
-    } finally {
-      context.dispose();
-    }
-  }
-
-  private IEclipseContext getEclipseContext() {
-    if (eclipseContextForTesting == null) {
-      return EclipseContextFactory.getServiceContext(FrameworkUtil.getBundle(getClass()).getBundleContext());
-    } else {
-      return eclipseContextForTesting;
     }
   }
 
