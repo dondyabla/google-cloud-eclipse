@@ -18,9 +18,6 @@ public class ServiceContextFactory implements IExecutableExtensionFactory, IExec
 
   private Class<?> clazz;
 
-  public ServiceContextFactory() {
-  }
-
   @Override
   public void setInitializationData(IConfigurationElement config, String propertyName, Object data)
       throws CoreException {

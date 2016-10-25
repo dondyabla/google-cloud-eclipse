@@ -34,7 +34,6 @@ import javax.inject.Inject;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
-import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jst.server.core.RuntimeClasspathProviderDelegate;
 import org.eclipse.wst.server.core.IRuntime;
