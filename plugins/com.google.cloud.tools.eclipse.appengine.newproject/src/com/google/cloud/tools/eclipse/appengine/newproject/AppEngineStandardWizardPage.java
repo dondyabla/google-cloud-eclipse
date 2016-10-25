@@ -41,7 +41,7 @@ import com.google.cloud.tools.eclipse.usagetracker.AnalyticsPingManager;
 public class AppEngineStandardWizardPage extends WizardNewProjectCreationPage {
 
   private Text javaPackageField;
-  private AppEngineLibrariesSelectorGroup addManageLibrariesGroup;
+  private AppEngineLibrariesSelectorGroup appEngineLibrariesSelectorGroup;
 
   public AppEngineStandardWizardPage() {
     super("basicNewProjectPage"); //$NON-NLS-1$
@@ -76,7 +76,7 @@ public class AppEngineStandardWizardPage extends WizardNewProjectCreationPage {
     javaPackageField.addModifyListener(pageValidator);
 
     // Manage APIs
-    addManageLibrariesGroup = new AppEngineLibrariesSelectorGroup(this, container);
+    appEngineLibrariesSelectorGroup = new AppEngineLibrariesSelectorGroup(this, container);
 
     Dialog.applyDialogFont(container);
   }
@@ -120,12 +120,12 @@ public class AppEngineStandardWizardPage extends WizardNewProjectCreationPage {
   }
 
   public List<Library> getSelectedLibraries() {
-    return addManageLibrariesGroup.getSelectedLibraries();
+    return appEngineLibrariesSelectorGroup.getSelectedLibraries();
   }
 
   @Override
   public void dispose() {
-    addManageLibrariesGroup.dispose();
+    appEngineLibrariesSelectorGroup.dispose();
     super.dispose();
   }
 }
