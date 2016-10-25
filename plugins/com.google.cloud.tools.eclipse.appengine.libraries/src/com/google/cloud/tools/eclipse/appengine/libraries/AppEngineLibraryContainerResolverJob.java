@@ -67,6 +67,7 @@ public class AppEngineLibraryContainerResolverJob extends Job {
 
   public AppEngineLibraryContainerResolverJob() {
     super(Messages.AppEngineLibraryContainerResolverJobName);
+    setUser(true);
   }
 
   @VisibleForTesting
