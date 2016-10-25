@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.eclipse.appengine.libraries.repository;
 
+@SuppressWarnings("serial")
 public class LibraryRepositoryServiceException extends Exception {
 
   public LibraryRepositoryServiceException(String message) {
