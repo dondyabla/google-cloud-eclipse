@@ -1,11 +1,11 @@
 /*
- * Copyright 2016 Google Inc. All Rights Reserved.
+ * Copyright 2016 Google Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -32,7 +32,11 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
+import org.eclipse.e4.core.contexts.ContextInjectionFactory;
+import org.eclipse.e4.core.contexts.EclipseContextFactory;
+import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.jdt.core.IAccessRule;
 import org.eclipse.jdt.core.IClasspathAttribute;
 import org.eclipse.jdt.core.IClasspathEntry;
@@ -45,6 +49,7 @@ import org.eclipse.ui.actions.WorkspaceModifyOperation;
 import org.eclipse.ui.ide.undo.CreateProjectOperation;
 import org.eclipse.wst.common.project.facet.core.IFacetedProject;
 import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
+import org.osgi.framework.FrameworkUtil;
 
 /**
 * Utility to make a new Eclipse project with the App Engine Standard facets in the workspace.  
@@ -95,6 +100,9 @@ class CreateAppEngineStandardWtpProject extends WorkspaceModifyOperation {
   private void addAppEngineLibrariesToBuildPath(IProject newProject,
                                                 List<Library> libraries,
                                                 IProgressMonitor monitor) throws CoreException {
+    if (libraries.isEmpty()) {
+      return;
+    }
     SubMonitor subMonitor = SubMonitor.convert(monitor, "Adding App Engine libraries", libraries.size());
     IJavaProject javaProject = JavaCore.create(newProject);
     IClasspathEntry[] rawClasspath = javaProject.getRawClasspath();
@@ -119,7 +127,22 @@ class CreateAppEngineStandardWtpProject extends WorkspaceModifyOperation {
     }
     javaProject.setRawClasspath(newRawClasspath, monitor);
     
-    Job job = new AppEngineLibraryContainerResolverJob("Initialize libraries", javaProject);
+    runContainerResolverJob(javaProject);
+  }
+
+  private void runContainerResolverJob(IJavaProject javaProject) {
+    IEclipseContext context =
+        EclipseContextFactory.getServiceContext(FrameworkUtil.getBundle(getClass()).getBundleContext());
+    final IEclipseContext childContext = context.createChild(AppEngineLibraryContainerResolverJob.class.getName());
+    childContext.set(IJavaProject.class, javaProject);
+    AppEngineLibraryContainerResolverJob job =
+        ContextInjectionFactory.make(AppEngineLibraryContainerResolverJob.class, childContext);
+    job.addJobChangeListener(new JobChangeAdapter() {
+      @Override
+      public void done(IJobChangeEvent event) {
+        childContext.dispose();
+      }
+    });
     job.schedule();
   }
 

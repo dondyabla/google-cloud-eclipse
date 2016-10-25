@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright 2016 Google Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *******************************************************************************/
+ */
 
 package com.google.cloud.tools.eclipse.appengine.libraries;
 
@@ -100,6 +100,8 @@ public class AppEngineLibraryContainerInitializer extends ClasspathContainerInit
     }
   }
 
+  // TODO parse library definition in ILibraryConfigService (or similar) started when the plugin/bundle starts
+  // https://github.com/GoogleCloudPlatform/google-cloud-eclipse/issues/856
   private void initializeLibraries(IConfigurationElement[] configurationElements, LibraryFactory libraryFactory) {
     libraries = new HashMap<>(configurationElements.length);
     for (IConfigurationElement configurationElement : configurationElements) {

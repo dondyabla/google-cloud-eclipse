@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright 2016 Google Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *******************************************************************************/
+ */
 
 package com.google.cloud.tools.eclipse.appengine.libraries;
 
@@ -29,6 +29,7 @@ import com.google.cloud.tools.eclipse.appengine.libraries.model.Library;
 import com.google.cloud.tools.eclipse.appengine.libraries.model.LibraryFactory;
 import com.google.cloud.tools.eclipse.appengine.libraries.model.LibraryFactoryException;
 import com.google.cloud.tools.eclipse.appengine.libraries.model.LibraryFile;
+import com.google.cloud.tools.eclipse.appengine.libraries.model.LibraryRecommendation;
 import com.google.cloud.tools.eclipse.appengine.libraries.model.MavenCoordinates;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -47,13 +48,17 @@ public class AppEngineLibrariesInPluginXmlTest {
   private static final String APP_ENGINE_API_LIBRARY_ID = "appengine-api";
   private static final String APP_ENGINE_ENDPOINTS_LIBRARY_ID = "appengine-endpoints";
   private static final String OBJECTIFY_LIBRARY_ID = "objectify";
+  private static final String SERVLET_API_LIBRARY_ID = "servlet-api";
+  private static final String JSP_API_LIBRARY_ID = "jsp-api";
 
   @Test
-  public void testThereAreOnlyThreeLibraries() {
+  public void testThereAreExactlyFiveLibraries() {
     IConfigurationElement[] configurationElements =
         RegistryFactory.getRegistry()
-          .getConfigurationElementsFor(AppEngineLibraryContainerInitializer.LIBRARIES_EXTENSION_POINT);
-    assertThat(configurationElements.length, is(3));
+          .getConfigurationElementsFor("com.google.cloud.tools.eclipse.appengine",
+                                       "libraries",
+                                       "com.google.cloud.tools.eclipse.appengine.libraries.defaultapis");
+    assertThat(configurationElements.length, is(5));
   }
 
   @Test
@@ -151,6 +156,68 @@ public class AppEngineLibrariesInPluginXmlTest {
     assertThat(mavenCoordinates.getGroupId(), is("com.googlecode.objectify"));
     assertThat(mavenCoordinates.getArtifactId(), is("objectify"));
     assertThat(mavenCoordinates.getVersion(), is("LATEST"));
+    assertThat(mavenCoordinates.getType(), is("jar"));
+    assertNull(mavenCoordinates.getClassifier());
+
+    assertNotNull(libraryFile.getFilters());
+    assertTrue(libraryFile.getFilters().isEmpty());
+  }
+
+  @Test
+  public void testServletApiLibraryConfig() throws URISyntaxException, LibraryFactoryException {
+    Library servletApiLibrary = getLibraryWithId(SERVLET_API_LIBRARY_ID);
+    assertThat(servletApiLibrary.getContainerPath().toString(),
+               is(Library.CONTAINER_PATH_PREFIX + "/" + SERVLET_API_LIBRARY_ID));
+    assertThat(servletApiLibrary.getId(), is(SERVLET_API_LIBRARY_ID));
+    assertThat(servletApiLibrary.getName(), is("Servlet API 2.5"));
+    assertThat(servletApiLibrary.getSiteUri(), is(new URI("http://www.oracle.com/technetwork/java/javaee/servlet/index.html")));
+    assertFalse(servletApiLibrary.isExport());
+    assertThat(servletApiLibrary.getRecommendation(), is(LibraryRecommendation.REQUIRED));
+    assertNotNull(servletApiLibrary.getLibraryDependencies());
+    assertTrue(servletApiLibrary.getLibraryDependencies().isEmpty());
+
+    assertThat(servletApiLibrary.getLibraryFiles().size(), is(1));
+    LibraryFile libraryFile = servletApiLibrary.getLibraryFiles().get(0);
+    assertThat(libraryFile.getJavadocUri(), is(new URI("https://docs.oracle.com/cd/E17802_01/products/products/servlet/2.5/docs/servlet-2_5-mr2/")));
+    assertNull(libraryFile.getSourceUri());
+
+    assertNotNull(libraryFile.getMavenCoordinates());
+    MavenCoordinates mavenCoordinates = libraryFile.getMavenCoordinates();
+    assertThat(mavenCoordinates.getRepository(), is("central"));
+    assertThat(mavenCoordinates.getGroupId(), is("javax.servlet"));
+    assertThat(mavenCoordinates.getArtifactId(), is("servlet-api"));
+    assertThat(mavenCoordinates.getVersion(), is("2.5"));
+    assertThat(mavenCoordinates.getType(), is("jar"));
+    assertNull(mavenCoordinates.getClassifier());
+
+    assertNotNull(libraryFile.getFilters());
+    assertTrue(libraryFile.getFilters().isEmpty());
+  }
+
+  @Test
+  public void testJspApiLibraryConfig() throws URISyntaxException, LibraryFactoryException {
+    Library servletApiLibrary = getLibraryWithId(JSP_API_LIBRARY_ID);
+    assertThat(servletApiLibrary.getContainerPath().toString(),
+               is(Library.CONTAINER_PATH_PREFIX + "/" + JSP_API_LIBRARY_ID));
+    assertThat(servletApiLibrary.getId(), is(JSP_API_LIBRARY_ID));
+    assertThat(servletApiLibrary.getName(), is("Java Server Pages API 2.1"));
+    assertThat(servletApiLibrary.getSiteUri(), is(new URI("http://www.oracle.com/technetwork/java/javaee/jsp/index.html")));
+    assertFalse(servletApiLibrary.isExport());
+    assertThat(servletApiLibrary.getRecommendation(), is(LibraryRecommendation.OPTIONAL));
+    assertNotNull(servletApiLibrary.getLibraryDependencies());
+    assertTrue(servletApiLibrary.getLibraryDependencies().isEmpty());
+
+    assertThat(servletApiLibrary.getLibraryFiles().size(), is(1));
+    LibraryFile libraryFile = servletApiLibrary.getLibraryFiles().get(0);
+    assertThat(libraryFile.getJavadocUri(), is(new URI("http://docs.oracle.com/cd/E17802_01/products/products/jsp/2.1/docs/jsp-2_1-pfd2/")));
+    assertNull(libraryFile.getSourceUri());
+
+    assertNotNull(libraryFile.getMavenCoordinates());
+    MavenCoordinates mavenCoordinates = libraryFile.getMavenCoordinates();
+    assertThat(mavenCoordinates.getRepository(), is("central"));
+    assertThat(mavenCoordinates.getGroupId(), is("javax.servlet.jsp"));
+    assertThat(mavenCoordinates.getArtifactId(), is("jsp-api"));
+    assertThat(mavenCoordinates.getVersion(), is("2.1"));
     assertThat(mavenCoordinates.getType(), is("jar"));
     assertNull(mavenCoordinates.getClassifier());
 

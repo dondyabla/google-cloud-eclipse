@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright 2016 Google Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *******************************************************************************/
+ */
 
 package com.google.cloud.tools.eclipse.appengine.libraries.persistence;
 
@@ -32,12 +32,14 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.e4.core.di.annotations.Creatable;
 import org.eclipse.jdt.core.IJavaProject;
 import org.osgi.framework.FrameworkUtil;
 
 /**
  * Provides functionality to save and load {@link LibraryClasspathContainer} instances to disk.
  */
+@Creatable
 public class LibraryClasspathContainerSerializer {
 
   private static final Logger logger = Logger.getLogger(LibraryClasspathContainerSerializer.class.getName());
