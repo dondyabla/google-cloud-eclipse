@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.eclipse.appengine.newproject;
+package com.google.cloud.tools.eclipse.appengine.ui;
 
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
-  private static final String BUNDLE_NAME = "com.google.cloud.tools.eclipse.appengine.newproject.messages"; //$NON-NLS-1$
-  public static String AppEngineJavaComponentMissing;
+  private static final String BUNDLE_NAME = "com.google.cloud.tools.eclipse.appengine.ui.messages"; //$NON-NLS-1$
+  public static String AppEngineStandardWizardPage_librariesGroupLabel;
 
   static {
     // initialize resource bundle
