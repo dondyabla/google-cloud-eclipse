@@ -75,7 +75,7 @@ public class AppEngineStandardWizardPage extends WizardNewProjectCreationPage {
     javaPackageField.addModifyListener(pageValidator);
 
     // Manage APIs
-    addManageLibrariesGroup = new AddManageLibrariesGroup(this, container, SWT.NONE);
+    addManageLibrariesGroup = new AddManageLibrariesGroup(this, container);
 
     Dialog.applyDialogFont(container);
   }

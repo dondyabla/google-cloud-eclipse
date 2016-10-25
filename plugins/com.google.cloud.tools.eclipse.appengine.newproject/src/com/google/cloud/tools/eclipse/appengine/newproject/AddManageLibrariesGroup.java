@@ -31,7 +31,7 @@ public class AddManageLibrariesGroup {
   private List<Button> libraryButtons = new LinkedList<>();
   private DataBindingContext bindingContext;
 
-  public AddManageLibrariesGroup(DialogPage parentDialog, Composite parentContainer, int style) {
+  public AddManageLibrariesGroup(DialogPage parentDialog, Composite parentContainer) {
     Preconditions.checkNotNull(parentDialog, "parentDialog is null");
     Preconditions.checkNotNull(parentContainer, "parentContainer is null");
 
