@@ -20,8 +20,7 @@ import com.google.cloud.tools.eclipse.appengine.facets.AppEngineStandardFacet;
 import com.google.cloud.tools.eclipse.appengine.libraries.model.Library;
 import com.google.cloud.tools.eclipse.util.MavenUtils;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Collections;
-import java.util.LinkedList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import org.apache.maven.archetype.catalog.Archetype;
@@ -49,7 +48,7 @@ public class CreateMavenBasedAppEngineStandardProject extends WorkspaceModifyOpe
   private String version;
   private IPath location;
   private Archetype archetype;
-  private List<String> appEngineLibraryIds = Collections.emptyList();
+  private HashSet<String> appEngineLibraryIds = new HashSet<String>();
 
   @Override
   protected void execute(IProgressMonitor monitor)
@@ -71,9 +70,9 @@ public class CreateMavenBasedAppEngineStandardProject extends WorkspaceModifyOpe
     // The project ID is currently necessary due to tool bugs.
     properties.put("application-id", artifactId);
     properties.put("useObjectify", "false");
-    properties.put("useEndpoints1", appEngineLibraryIds.contains("appengine-endpoints"));
+    properties.put("useEndpoints1", Boolean.toString(appEngineLibraryIds.contains("appengine-endpoints")));
     properties.put("useEndpoints2", false);
-    properties.put("useAppEngineApi", appEngineLibraryIds.contains("appengine-api"));
+    properties.put("useAppEngineApi", Boolean.toString(appEngineLibraryIds.contains("appengine-api")));
 
     ProjectImportConfiguration importConfiguration = new ProjectImportConfiguration();
     String packageName = this.packageName == null || this.packageName.isEmpty() 
@@ -135,7 +134,7 @@ public class CreateMavenBasedAppEngineStandardProject extends WorkspaceModifyOpe
   }
 
   void setAppEngineLibraryIds(List<Library> libraries) {
-    appEngineLibraryIds = new LinkedList<>();
+    appEngineLibraryIds = new HashSet<String>();
     for (int i = 0; i < libraries.size(); i++) {
       appEngineLibraryIds.add(libraries.get(i).getId());
     }
