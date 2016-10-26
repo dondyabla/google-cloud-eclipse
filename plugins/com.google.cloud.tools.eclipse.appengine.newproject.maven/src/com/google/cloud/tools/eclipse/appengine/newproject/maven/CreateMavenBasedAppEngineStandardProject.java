@@ -20,6 +20,7 @@ import com.google.cloud.tools.eclipse.appengine.facets.AppEngineStandardFacet;
 import com.google.cloud.tools.eclipse.appengine.libraries.model.Library;
 import com.google.cloud.tools.eclipse.util.MavenUtils;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
@@ -48,7 +49,7 @@ public class CreateMavenBasedAppEngineStandardProject extends WorkspaceModifyOpe
   private String version;
   private IPath location;
   private Archetype archetype;
-  private List<String> appEngineLibraryIds;
+  private List<String> appEngineLibraryIds = Collections.emptyList();
 
   @Override
   protected void execute(IProgressMonitor monitor)
