@@ -71,7 +71,7 @@ public class CreateMavenBasedAppEngineStandardProject extends WorkspaceModifyOpe
     properties.put("application-id", artifactId);
     properties.put("useObjectify", "false");
     properties.put("useEndpoints1", appEngineLibraryIds.contains("appengine-endpoints"));
-    properties.put("useEndpoints2", appEngineLibraryIds.contains("appengine-endpoints"));
+    properties.put("useEndpoints2", false);
     properties.put("useAppEngineApi", appEngineLibraryIds.contains("appengine-api"));
 
     ProjectImportConfiguration importConfiguration = new ProjectImportConfiguration();
