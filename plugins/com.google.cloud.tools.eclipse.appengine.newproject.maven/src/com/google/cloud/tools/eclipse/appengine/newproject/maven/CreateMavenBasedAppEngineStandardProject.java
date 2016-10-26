@@ -17,8 +17,10 @@
 package com.google.cloud.tools.eclipse.appengine.newproject.maven;
 
 import com.google.cloud.tools.eclipse.appengine.facets.AppEngineStandardFacet;
+import com.google.cloud.tools.eclipse.appengine.libraries.model.Library;
 import com.google.cloud.tools.eclipse.util.MavenUtils;
 import java.lang.reflect.InvocationTargetException;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 import org.apache.maven.archetype.catalog.Archetype;
@@ -46,6 +48,7 @@ public class CreateMavenBasedAppEngineStandardProject extends WorkspaceModifyOpe
   private String version;
   private IPath location;
   private Archetype archetype;
+  private List<String> appEngineLibraryIds;
 
   @Override
   protected void execute(IProgressMonitor monitor)
@@ -67,9 +70,9 @@ public class CreateMavenBasedAppEngineStandardProject extends WorkspaceModifyOpe
     // The project ID is currently necessary due to tool bugs.
     properties.put("application-id", artifactId);
     properties.put("useObjectify", "false");
-    properties.put("useEndpoints1", "false");
-    properties.put("useEndpoints2", "false");
-    properties.put("useAppEngineApi", "false");
+    properties.put("useEndpoints1", appEngineLibraryIds.contains("appengine-endpoints"));
+    properties.put("useEndpoints2", appEngineLibraryIds.contains("appengine-endpoints"));
+    properties.put("useAppEngineApi", appEngineLibraryIds.contains("appengine-api"));
 
     ProjectImportConfiguration importConfiguration = new ProjectImportConfiguration();
     String packageName = this.packageName == null || this.packageName.isEmpty() 
@@ -128,6 +131,13 @@ public class CreateMavenBasedAppEngineStandardProject extends WorkspaceModifyOpe
   
   void setArchetype(Archetype archetype) {
     this.archetype = archetype;
+  }
+
+  void setAppEngineLibraryIds(List<Library> libraries) {
+    appEngineLibraryIds = new LinkedList<>();
+    for (int i = 0; i < libraries.size(); i++) {
+      appEngineLibraryIds.add(libraries.get(i).getId());
+    }
   }
 
 }

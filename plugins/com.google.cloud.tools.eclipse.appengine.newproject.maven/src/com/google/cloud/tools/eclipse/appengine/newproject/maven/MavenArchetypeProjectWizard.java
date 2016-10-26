@@ -69,6 +69,7 @@ public class MavenArchetypeProjectWizard extends Wizard implements INewWizard {
     operation.setVersion(page.getVersion());
     operation.setLocation(page.getLocationPath());
     operation.setArchetype(archetypePage.getArchetype());
+    operation.setAppEngineLibraryIds(page.getSelectedLibraries());
 
     IRunnableWithProgress runnable = new IRunnableWithProgress() {
       @Override
