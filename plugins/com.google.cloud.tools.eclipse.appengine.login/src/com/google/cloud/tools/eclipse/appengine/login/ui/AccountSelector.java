@@ -21,7 +21,6 @@ import com.google.api.client.util.Strings;
 import com.google.cloud.tools.eclipse.appengine.login.IGoogleLoginService;
 import com.google.cloud.tools.ide.login.Account;
 import com.google.common.annotations.VisibleForTesting;
-
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
@@ -100,9 +99,20 @@ public class AccountSelector extends Composite {
     return index;
   }
 
+  /** If there exists only one account, returns its email. Otherwise, returns {@code null}. */
+  public String getSingleAccountEmail() {
+    if (getAccountCount() == 1) {
+      return combo.getItem(0);
+    }
+    return null;
+  }
+
   public boolean isSignedIn() {
-    // <Add a new account...> is always in the combo
-    return combo.getItemCount() > 1;
+    return getAccountCount() > 0;
+  }
+
+  private int getAccountCount() {
+    return combo.getItemCount() - 1;  // <Add a new account...> is always in the combo
   }
 
   @VisibleForTesting

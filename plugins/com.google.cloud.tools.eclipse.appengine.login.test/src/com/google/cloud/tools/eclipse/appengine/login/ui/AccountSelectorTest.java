@@ -30,7 +30,8 @@ import com.google.api.client.auth.oauth2.Credential;
 import com.google.cloud.tools.eclipse.appengine.login.IGoogleLoginService;
 import com.google.cloud.tools.eclipse.test.util.ui.ShellTestResource;
 import com.google.cloud.tools.ide.login.Account;
-
+import java.util.Arrays;
+import java.util.HashSet;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Shell;
@@ -40,9 +41,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import java.util.Arrays;
-import java.util.HashSet;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AccountSelectorTest {
@@ -268,7 +266,6 @@ public class AccountSelectorTest {
 
   @Test
   public void testIsSignedIn_notSignedIn() {
-    when(loginService.hasAccounts()).thenReturn(false);
     AccountSelector selector = new AccountSelector(shell, loginService, "<select this to login>");
     assertFalse(selector.isSignedIn());
   }
@@ -278,6 +275,26 @@ public class AccountSelectorTest {
     when(loginService.getAccounts()).thenReturn(new HashSet<>(Arrays.asList(account1)));
     AccountSelector selector = new AccountSelector(shell, loginService, "<select this to login>");
     assertTrue(selector.isSignedIn());
+  }
+
+  @Test
+  public void testGetSingleAccountEmail() {
+    AccountSelector selector = new AccountSelector(shell, loginService, "<select this to login>");
+    assertNull(selector.getSingleAccountEmail());
+  }
+
+  @Test
+  public void testGetSingleAccountEmail_oneAccount() {
+    when(loginService.getAccounts()).thenReturn(new HashSet<>(Arrays.asList(account1)));
+    AccountSelector selector = new AccountSelector(shell, loginService, "<select this to login>");
+    assertEquals("some-email-1@example.com", selector.getSingleAccountEmail());
+  }
+
+  @Test
+  public void testGetSingleAccountEmail_twoAccounts() {
+    when(loginService.getAccounts()).thenReturn(new HashSet<>(Arrays.asList(account1, account2)));
+    AccountSelector selector = new AccountSelector(shell, loginService, "<select this to login>");
+    assertNull(selector.getSingleAccountEmail());
   }
 
   private void simulateSelect(AccountSelector selector, int index) {

@@ -161,6 +161,11 @@ public class StandardDeployPreferencesPanel extends DeployPreferencesPanel {
         .setConverter(new Converter(String.class, String.class) {
       @Override
       public Object convert(Object fromObject /* email */) {
+        // If there exists only one account signed in, make it selected.
+        String singleAccountEmail = accountSelector.getSingleAccountEmail();
+        if (singleAccountEmail != null) {
+          return singleAccountEmail;
+        }
         return accountSelector.isEmailAvailable((String) fromObject) ? fromObject : null;
       }
     });
