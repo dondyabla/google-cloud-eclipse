@@ -141,7 +141,7 @@ public class StandardDeployPreferencesPanel extends DeployPreferencesPanel {
   }
 
   private void setupAccountEmailDataBinding(DataBindingContext context) {
-    IValidator accountSelectedChecker = new IValidator() {
+    final IValidator accountSelectedChecker = new IValidator() {
       @Override
       public IStatus validate(Object value /* email */) {
         if (requireValues && Strings.isNullOrEmpty((String) value)) {
@@ -154,18 +154,24 @@ public class StandardDeployPreferencesPanel extends DeployPreferencesPanel {
         return ValidationStatus.ok();
       }
     };
+    IValidator modelToTargetValidator = new IValidator() {
+      @Override
+      public IStatus validate(Object value /* email */) {
+        // If there exists only one account, it will be auto-selected.
+        if (accountSelector.getAccountCount() == 1) {
+          return ValidationStatus.ok();
+        }
+        return accountSelectedChecker.validate(value);
+      }
+    };
+
     UpdateValueStrategy targetToModel = new UpdateValueStrategy()
         .setBeforeSetValidator(accountSelectedChecker);
     UpdateValueStrategy modelToTarget = new UpdateValueStrategy()
-        .setBeforeSetValidator(accountSelectedChecker)
+        .setBeforeSetValidator(modelToTargetValidator)
         .setConverter(new Converter(String.class, String.class) {
       @Override
       public Object convert(Object fromObject /* email */) {
-        // If there exists only one account signed in, make it selected.
-        String singleAccountEmail = accountSelector.getSingleAccountEmail();
-        if (singleAccountEmail != null) {
-          return singleAccountEmail;
-        }
         return accountSelector.isEmailAvailable((String) fromObject) ? fromObject : null;
       }
     });

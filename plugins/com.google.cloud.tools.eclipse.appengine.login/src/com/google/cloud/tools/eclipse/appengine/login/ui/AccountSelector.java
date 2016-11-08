@@ -99,19 +99,25 @@ public class AccountSelector extends Composite {
     return index;
   }
 
-  /** If there exists only one account, returns its email. Otherwise, returns {@code null}. */
-  public String getSingleAccountEmail() {
+  /**
+   * Works the same way as {@code selectAccount} does, except that if there exists only one
+   * account signed in, that account will always be selected regardless of {@code email}.
+   *
+   * @see #selectAccount
+   */
+  public int selectAccountInSingleAccountSelectMode(String email) {
     if (getAccountCount() == 1) {
-      return combo.getItem(0);
+      return selectAccount(combo.getItem(0));
+    } else {
+      return selectAccount(email);
     }
-    return null;
   }
 
   public boolean isSignedIn() {
     return getAccountCount() > 0;
   }
 
-  private int getAccountCount() {
+  public int getAccountCount() {
     return combo.getItemCount() - 1;  // <Add a new account...> is always in the combo
   }
 
