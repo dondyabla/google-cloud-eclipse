@@ -324,6 +324,27 @@ public class AccountSelectorTest {
     assertTrue(selector.isSignedIn());
   }
 
+  @Test
+  public void testGetAccountCount() {
+    AccountSelector selector = new AccountSelector(shell, loginService, "<select this to login>");
+    assertEquals(0, selector.getAccountCount());
+  }
+
+  @Test
+  public void testGetAccountCount_oneAccount() {
+    when(loginService.getAccounts()).thenReturn(new HashSet<>(Arrays.asList(account1)));
+    AccountSelector selector = new AccountSelector(shell, loginService, "<select this to login>");
+    assertEquals(1, selector.getAccountCount());
+  }
+
+  @Test
+  public void testGetAccountCount_threeAccounts() {
+    when(loginService.getAccounts()).thenReturn(
+        new HashSet<>(Arrays.asList(account1, account2, account3)));
+    AccountSelector selector = new AccountSelector(shell, loginService, "<select this to login>");
+    assertEquals(3, selector.getAccountCount());
+  }
+
   private void simulateSelect(AccountSelector selector, int index) {
     selector.combo.select(index);
     selector.combo.notifyListeners(SWT.Selection, mock(Event.class));
