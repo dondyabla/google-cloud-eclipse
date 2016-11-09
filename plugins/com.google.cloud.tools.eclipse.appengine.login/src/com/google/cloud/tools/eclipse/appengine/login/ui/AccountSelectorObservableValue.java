@@ -58,6 +58,6 @@ public class AccountSelectorObservableValue extends AbstractObservableValue {
 
   @Override
   protected void doSetValue(final Object value) {
-    accountSelector.selectAccountInSingleAccountSelectMode((String) value);
+    accountSelector.selectAccount((String) value);
   }
 }

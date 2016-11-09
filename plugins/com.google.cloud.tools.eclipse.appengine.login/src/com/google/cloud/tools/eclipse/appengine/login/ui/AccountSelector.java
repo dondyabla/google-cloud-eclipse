@@ -35,6 +35,7 @@ public class AccountSelector extends Composite {
   private IGoogleLoginService loginService;
   private String loginMessage;
   private Credential selectedCredential;
+  private boolean selectDefaultSingleAccount = true;
 
   @VisibleForTesting Combo combo;
   @VisibleForTesting LogInOnSelect logInOnSelect = new LogInOnSelect();
@@ -55,6 +56,10 @@ public class AccountSelector extends Composite {
     }
     combo.add(loginMessage);
     combo.addSelectionListener(logInOnSelect);
+    if (selectDefaultSingleAccount && getAccountCount() == 1) {
+      combo.select(0);
+      selectedCredential = (Credential) combo.getData(combo.getItem(0));
+    }
   }
 
   /**
@@ -92,25 +97,15 @@ public class AccountSelector extends Composite {
    */
   public int selectAccount(String email) {
     int index = Strings.isNullOrEmpty(email) ? -1 : combo.indexOf(email);
+    if (index < 0 && selectDefaultSingleAccount && getAccountCount() == 1) {
+      index = 0;
+      email = combo.getItem(0);
+    }
     if (index != -1) {
       combo.select(index);
       selectedCredential = (Credential) combo.getData(email);
     }
     return index;
-  }
-
-  /**
-   * Works the same way as {@code selectAccount} does, except that if only one account is signed
-   * in, that account will always be selected regardless of {@code email}.
-   *
-   * @see #selectAccount
-   */
-  public int selectAccountInSingleAccountSelectMode(String email) {
-    if (getAccountCount() == 1) {
-      return selectAccount(combo.getItem(0));
-    } else {
-      return selectAccount(email);
-    }
   }
 
   public boolean isSignedIn() {

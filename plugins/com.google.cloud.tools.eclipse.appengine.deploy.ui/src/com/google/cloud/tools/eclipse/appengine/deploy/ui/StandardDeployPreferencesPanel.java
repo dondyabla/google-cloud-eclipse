@@ -141,10 +141,23 @@ public class StandardDeployPreferencesPanel extends DeployPreferencesPanel {
   }
 
   private void setupAccountEmailDataBinding(DataBindingContext context) {
+    IValidator accountSelectedChecker = new IValidator() {
+      @Override
+      public IStatus validate(Object value /* email */) {
+        if (requireValues && Strings.isNullOrEmpty((String) value)) {
+          if (accountSelector.isSignedIn()) {
+            return ValidationStatus.error(Messages.getString("error.account.missing.signedin"));
+          } else {
+            return ValidationStatus.error(Messages.getString("error.account.missing.signedout"));
+          }
+        }
+        return ValidationStatus.ok();
+      }
+    };
     UpdateValueStrategy targetToModel = new UpdateValueStrategy()
-        .setBeforeSetValidator(new AccountSelectedChecker());
+        .setBeforeSetValidator(accountSelectedChecker);
     UpdateValueStrategy modelToTarget = new UpdateValueStrategy()
-        .setBeforeSetValidator(new ModelToAccountSelectorValidator())
+        .setBeforeSetValidator(accountSelectedChecker)
         .setConverter(new Converter(String.class, String.class) {
       @Override
       public Object convert(Object fromObject /* email */) {
@@ -452,29 +465,4 @@ public class StandardDeployPreferencesPanel extends DeployPreferencesPanel {
     expandableComposite.setFont(font);
     FontUtil.convertFontToBold(expandableComposite);
   }
-
-  private class AccountSelectedChecker implements IValidator {
-    @Override
-    public IStatus validate(Object value /* email */) {
-      if (requireValues && Strings.isNullOrEmpty((String) value)) {
-        if (accountSelector.isSignedIn()) {
-          return ValidationStatus.error(Messages.getString("error.account.missing.signedin"));
-        } else {
-          return ValidationStatus.error(Messages.getString("error.account.missing.signedout"));
-        }
-      }
-      return ValidationStatus.ok();
-    }
-  };
-
-  private class ModelToAccountSelectorValidator implements IValidator {
-    @Override
-    public IStatus validate(Object value /* email */) {
-      // Return OK, because if only one account is signed in, accountSelector will auto-select it.
-      if (accountSelector.getAccountCount() == 1) {
-        return ValidationStatus.ok();
-      }
-      return new AccountSelectedChecker().validate(value);
-    }
-  };
 }
