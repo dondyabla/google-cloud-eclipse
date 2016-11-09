@@ -141,34 +141,10 @@ public class StandardDeployPreferencesPanel extends DeployPreferencesPanel {
   }
 
   private void setupAccountEmailDataBinding(DataBindingContext context) {
-    final IValidator accountSelectedChecker = new IValidator() {
-      @Override
-      public IStatus validate(Object value /* email */) {
-        if (requireValues && Strings.isNullOrEmpty((String) value)) {
-          if (accountSelector.isSignedIn()) {
-            return ValidationStatus.error(Messages.getString("error.account.missing.signedin"));
-          } else {
-            return ValidationStatus.error(Messages.getString("error.account.missing.signedout"));
-          }
-        }
-        return ValidationStatus.ok();
-      }
-    };
-    IValidator modelToTargetValidator = new IValidator() {
-      @Override
-      public IStatus validate(Object value /* email */) {
-        // OK, because if only one account is signed in, accountSelector will be auto-selected.
-        if (accountSelector.getAccountCount() == 1) {
-          return ValidationStatus.ok();
-        }
-        return accountSelectedChecker.validate(value);
-      }
-    };
-
     UpdateValueStrategy targetToModel = new UpdateValueStrategy()
-        .setBeforeSetValidator(accountSelectedChecker);
+        .setBeforeSetValidator(new AccountSelectedChecker());
     UpdateValueStrategy modelToTarget = new UpdateValueStrategy()
-        .setBeforeSetValidator(modelToTargetValidator)
+        .setBeforeSetValidator(new ModelToAccountSelectorValidator())
         .setConverter(new Converter(String.class, String.class) {
       @Override
       public Object convert(Object fromObject /* email */) {
@@ -476,4 +452,29 @@ public class StandardDeployPreferencesPanel extends DeployPreferencesPanel {
     expandableComposite.setFont(font);
     FontUtil.convertFontToBold(expandableComposite);
   }
+
+  private class AccountSelectedChecker implements IValidator {
+    @Override
+    public IStatus validate(Object value /* email */) {
+      if (requireValues && Strings.isNullOrEmpty((String) value)) {
+        if (accountSelector.isSignedIn()) {
+          return ValidationStatus.error(Messages.getString("error.account.missing.signedin"));
+        } else {
+          return ValidationStatus.error(Messages.getString("error.account.missing.signedout"));
+        }
+      }
+      return ValidationStatus.ok();
+    }
+  };
+
+  private class ModelToAccountSelectorValidator implements IValidator {
+    @Override
+    public IStatus validate(Object value /* email */) {
+      // OK, because if only one account is signed in, accountSelector will be auto-selected.
+      if (accountSelector.getAccountCount() == 1) {
+        return ValidationStatus.ok();
+      }
+      return new AccountSelectedChecker().validate(value);
+    }
+  };
 }
