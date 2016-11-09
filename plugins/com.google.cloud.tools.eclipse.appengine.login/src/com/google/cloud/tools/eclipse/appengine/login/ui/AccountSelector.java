@@ -100,8 +100,8 @@ public class AccountSelector extends Composite {
   }
 
   /**
-   * Works the same way as {@code selectAccount} does, except that if there exists only one
-   * account signed in, that account will always be selected regardless of {@code email}.
+   * Works the same way as {@code selectAccount} does, except that if only one account is signed
+   * in, that account will always be selected regardless of {@code email}.
    *
    * @see #selectAccount
    */

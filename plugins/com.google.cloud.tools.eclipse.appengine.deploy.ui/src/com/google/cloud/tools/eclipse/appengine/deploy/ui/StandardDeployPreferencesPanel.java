@@ -157,7 +157,7 @@ public class StandardDeployPreferencesPanel extends DeployPreferencesPanel {
     IValidator modelToTargetValidator = new IValidator() {
       @Override
       public IStatus validate(Object value /* email */) {
-        // If there exists only one account, it will be auto-selected.
+        // OK, because if only one account is signed in, accountSelector will be auto-selected.
         if (accountSelector.getAccountCount() == 1) {
           return ValidationStatus.ok();
         }
