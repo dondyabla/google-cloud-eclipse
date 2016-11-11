@@ -35,16 +35,26 @@ public class AccountSelector extends Composite {
   private IGoogleLoginService loginService;
   private String loginMessage;
   private Credential selectedCredential;
+
+  /**
+   * If true and if there is no selected account and there is exactly one logged-in account, then
+   * select that account.
+   */
   private boolean selectDefaultSingleAccount = true;
 
   @VisibleForTesting Combo combo;
   @VisibleForTesting LogInOnSelect logInOnSelect = new LogInOnSelect();
 
+  public AccountSelector(Composite parent, IGoogleLoginService loginService, String loginMessage) {
+    this(parent, loginService, loginMessage, false);
+  }
+
   public AccountSelector(Composite parent, IGoogleLoginService loginService,
-                         String loginMessage) {
+      String loginMessage, boolean selectDefaultSingleAccount) {
     super(parent, SWT.NONE);
     this.loginService = loginService;
     this.loginMessage = loginMessage;
+    this.selectDefaultSingleAccount = selectDefaultSingleAccount;
     GridLayoutFactory.fillDefaults().generateLayout(this);
 
     combo = new Combo(this, SWT.READ_ONLY);
@@ -81,19 +91,23 @@ public class AccountSelector extends Composite {
     return selectedCredential;
   }
 
+  /**
+   * Returns the currently selected email, or empty string if none; never {@code null}.
+   */
   public String getSelectedEmail() {
     return combo.getText();
   }
 
   /**
-   * Selects an account corresponding to the given {@code email} and returns its index of the
-   * combo item. If there is no account corresponding to the {@code email}, returns -1 while
-   * retaining current selection (if any).
+   * Selects an account corresponding to the given {@code email} and returns its index of the combo
+   * item. If there is no account corresponding to the {@code email}, <b>and</b> there is exactly 1
+   * known account and {@link #selectDefaultSingleAccount} is true, then we automatically select
+   * that single account; otherwise this method does returns -1 while retaining current selection
+   * (if any).
    *
-   * @param email email address to use to select an account. If {@code null} or the empty string,
-   *     or if there is no matching account, this method does nothing
-   * @return index of the newly selected combo item; -1 if {@code email} is {@code null} or
-   *     the empty string, or if there is no matching account
+   * @param email email address to use to select an account.
+   * @return index of the newly selected combo item; -1 if {@code email} is {@code null} or the
+   *         empty string, or if there is no matching account
    */
   public int selectAccount(String email) {
     int index = Strings.isNullOrEmpty(email) ? -1 : combo.indexOf(email);

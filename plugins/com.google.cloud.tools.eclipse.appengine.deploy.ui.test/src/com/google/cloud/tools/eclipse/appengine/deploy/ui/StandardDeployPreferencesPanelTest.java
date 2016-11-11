@@ -18,6 +18,7 @@ package com.google.cloud.tools.eclipse.appengine.deploy.ui;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -69,12 +70,22 @@ public class StandardDeployPreferencesPanelTest {
     StandardDeployPreferencesPanel deployPanel = new StandardDeployPreferencesPanel(
         parent, project, loginService, layoutChangedHandler, true);
     assertThat(deployPanel.getSelectedCredential(), is(credential));
+
+    // todo? assertTrue(deployPanel.getAccountSelector().isAutoSelectAccountIfNone()
+
+    // verify not in error
+    IStatus status = getAccountSelectorValidationStatus(deployPanel);
+    assertTrue("account selector is in error: " + status.getMessage(), status.isOK());
+
+    assertThat("auto-selected value should be propagated back to model",
+        deployPanel.model.getAccountEmail(), is(account1.getEmail()));
   }
 
   @Test
   public void testValidationMessageWhenNotSignedIn() {
     StandardDeployPreferencesPanel deployPanel = new StandardDeployPreferencesPanel(parent, project, loginService, layoutChangedHandler, true);
-    assertThat(getAccountSelectorValidationStatus(deployPanel), is("Sign in to Google."));
+    IStatus status = getAccountSelectorValidationStatus(deployPanel);
+    assertThat(status.getMessage(), is("Sign in to Google."));
   }
 
   @Test
@@ -83,21 +94,27 @@ public class StandardDeployPreferencesPanelTest {
     when(loginService.getAccounts()).thenReturn(new HashSet<>(Arrays.asList(account1, account2)));
 
     StandardDeployPreferencesPanel deployPanel = new StandardDeployPreferencesPanel(parent, project, loginService, layoutChangedHandler, true);
-    assertThat(getAccountSelectorValidationStatus(deployPanel), is("Select an account."));
+    IStatus status = getAccountSelectorValidationStatus(deployPanel);
+    assertThat(status.getMessage(), is("Select an account."));
   }
 
-  private String getAccountSelectorValidationStatus(StandardDeployPreferencesPanel deployPanel) {
+  private IStatus getAccountSelectorValidationStatus(StandardDeployPreferencesPanel deployPanel) {
+    IStatus status = null;
     for (Object object : deployPanel.getDataBindingContext().getValidationStatusProviders()) {
       ValidationStatusProvider statusProvider = (ValidationStatusProvider) object;
       if (!statusProvider.getTargets().isEmpty()) {
         if (statusProvider.getTargets().get(0) instanceof AccountSelectorObservableValue) {
-          IStatus status = (IStatus) statusProvider.getValidationStatus().getValue();
-          return status.getMessage();
+          status = (IStatus) statusProvider.getValidationStatus().getValue();
+          if (!status.isOK()) {
+            return status;
+          }
         }
       }
     }
-    fail("Could not find AccountSelector databinding to verify validation");
-    return null;
+    if (status == null) {
+      fail("Could not find AccountSelector databinding to verify validation");
+    }
+    return status;
   }
 
 }
