@@ -26,9 +26,13 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.wst.common.componentcore.ComponentCore;
+import org.eclipse.wst.common.componentcore.resources.IVirtualComponent;
+import org.eclipse.wst.common.componentcore.resources.IVirtualFolder;
 import org.eclipse.wst.common.project.facet.core.IFacetedProject;
 import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
 import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
@@ -44,19 +48,26 @@ public class StandardFacetInstallDelegate extends AppEngineFacetInstallDelegate 
     super.execute(project, version, config, monitor);
     // If Dynamic Web facet was additionally installed together, it will have created "WebContent/"
     // as the default webapp directory (unless the user changed the default when installing
-    // the Web facet. We detect if there already existed another webapp directory, and if so,
+    // the Web facet). We detect if there already existed another webapp directory, and if so,
     // fix the default webapp setting to point to the existing directory.
-    fixWebContentRootIfNecessary(project);
+    fixWebContentRootIfNecessary(project, monitor);
 
     createConfigFiles(project, monitor);
     installAppEngineRuntimes(project);
   }
 
-  private void fixWebContentRootIfNecessary(IProject project) {
+  private void fixWebContentRootIfNecessary(IProject project, IProgressMonitor monitor)
+      throws CoreException {
     if (WebProjectUtil.isDefaultWebContentFolderBogus(project)) {
-      Fix/update webapp setting in ".settings/org.eclipse.wst.common.component" (XML). How? To figure out...
 
-      Delete "WebContent" folder. (Skip this? But it's very confusing that this folder exists.)
+      // Fix/update webapp setting in ".settings/org.eclipse.wst.common.component" (XML). How? To figure out...
+      IVirtualComponent component = ComponentCore.createComponent(project /* of IProject */);
+      if (component != null && component.exists()) {
+        IVirtualFolder rootFolder = component.getRootFolder();
+        rootFolder.removeLink(new Path("/WebContent"), IVirtualFolder.FORCE, monitor);
+      }
+
+      // Delete "WebContent" folder. (Skip this? But it's very confusing that this folder exists.)
     }
   }
 
