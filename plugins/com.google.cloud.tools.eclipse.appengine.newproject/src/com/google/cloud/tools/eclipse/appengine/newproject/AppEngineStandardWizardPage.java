@@ -25,9 +25,11 @@ import java.io.File;
 import java.util.Collection;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
@@ -64,21 +66,35 @@ public class AppEngineStandardWizardPage extends WizardNewProjectCreationPage {
     PlatformUI.getWorkbench().getHelpSystem().setHelp(container,
         "com.google.cloud.tools.eclipse.appengine.newproject.NewProjectContext"); //$NON-NLS-1$
 
-    ModifyListener pageValidator = new PageValidator();
 
-    // Java package name
-    Label packageNameLabel = new Label(container, SWT.NONE);
-    packageNameLabel.setText(Messages.getString("java.package")); //$NON-NLS-1$
-    javaPackageField = new Text(container, SWT.BORDER);
-    GridData javaPackagePosition = new GridData(GridData.FILL_HORIZONTAL);
-    javaPackagePosition.horizontalSpan = 2;
-    javaPackageField.setLayoutData(javaPackagePosition);
-    javaPackageField.addModifyListener(pageValidator);
+    createPackageField(container);
 
     // Manage APIs
     appEngineLibrariesSelectorGroup = new AppEngineLibrariesSelectorGroup(container);
 
     Dialog.applyDialogFont(container);
+  }
+
+  // Java package name
+  private void createPackageField(Composite container) {
+    
+    Composite composite = new Composite(container, SWT.NONE);
+    GridData compositePosition = new GridData(GridData.FILL_HORIZONTAL);
+    compositePosition.horizontalSpan = 2;
+    composite.setLayoutData(compositePosition);
+    
+    Label packageNameLabel = new Label(composite, SWT.NONE);
+    packageNameLabel.setText(Messages.getString("java.package")); //$NON-NLS-1$
+    javaPackageField = new Text(composite, SWT.BORDER);
+    
+    GridData javaPackagePosition = new GridData(GridData.FILL_HORIZONTAL);
+    javaPackageField.setLayoutData(javaPackagePosition);
+    ModifyListener pageValidator = new PageValidator();
+    javaPackageField.addModifyListener(pageValidator);
+    
+    composite.setLayout(new FillLayout());
+    
+    GridLayoutFactory.fillDefaults().numColumns(2).extendedMargins(0, 0, 0, 8).applyTo(composite);
   }
 
   @Override
