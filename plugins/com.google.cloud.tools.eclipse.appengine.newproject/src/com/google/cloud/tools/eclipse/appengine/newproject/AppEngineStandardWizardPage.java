@@ -53,7 +53,6 @@ public class AppEngineStandardWizardPage extends WizardNewProjectCreationPage {
     setImageDescriptor(AppEngineImages.appEngine(64));
   }
 
-  // todo is there a way to call this for a test?
   @Override
   public void createControl(Composite parent) {
     super.createControl(parent);
@@ -63,9 +62,9 @@ public class AppEngineStandardWizardPage extends WizardNewProjectCreationPage {
         AnalyticsEvents.APP_ENGINE_NEW_PROJECT_WIZARD_TYPE_NATIVE, parent.getShell());
 
     Composite container = (Composite) getControl();
+    GridLayoutFactory.fillDefaults().numColumns(1).extendedMargins(0, 0, 0, 8).applyTo(container);
     PlatformUI.getWorkbench().getHelpSystem().setHelp(container,
         "com.google.cloud.tools.eclipse.appengine.newproject.NewProjectContext"); //$NON-NLS-1$
-
 
     createPackageField(container);
 
@@ -89,6 +88,7 @@ public class AppEngineStandardWizardPage extends WizardNewProjectCreationPage {
     
     GridData javaPackagePosition = new GridData(GridData.FILL_HORIZONTAL);
     javaPackageField.setLayoutData(javaPackagePosition);
+    
     ModifyListener pageValidator = new PageValidator();
     javaPackageField.addModifyListener(pageValidator);
     
