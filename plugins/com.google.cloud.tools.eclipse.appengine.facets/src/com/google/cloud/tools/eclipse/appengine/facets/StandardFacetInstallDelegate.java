@@ -34,7 +34,7 @@ import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
 import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
 
 public class StandardFacetInstallDelegate extends AppEngineFacetInstallDelegate {
-  private final static String APPENGINE_WEB_XML = "appengine-web.xml";
+  private static final String APPENGINE_WEB_XML = "appengine-web.xml";
 
   @Override
   public void execute(IProject project,
@@ -42,8 +42,22 @@ public class StandardFacetInstallDelegate extends AppEngineFacetInstallDelegate 
                       Object config,
                       IProgressMonitor monitor) throws CoreException {
     super.execute(project, version, config, monitor);
+    // If Dynamic Web facet was additionally installed together, it will have created "WebContent/"
+    // as the default webapp directory (unless the user changed the default when installing
+    // the Web facet. We detect if there already existed another webapp directory, and if so,
+    // fix the default webapp setting to point to the existing directory.
+    fixWebContentRootIfNecessary(project);
+
     createConfigFiles(project, monitor);
     installAppEngineRuntimes(project);
+  }
+
+  private void fixWebContentRootIfNecessary(IProject project) {
+    if (WebProjectUtil.isDefaultWebContentFolderBogus(project)) {
+      Fix/update webapp setting in ".settings/org.eclipse.wst.common.component" (XML). How? To figure out...
+
+      Delete "WebContent" folder. (Skip this? But it's very confusing that this folder exists.)
+    }
   }
 
   private void installAppEngineRuntimes(final IProject project) {
