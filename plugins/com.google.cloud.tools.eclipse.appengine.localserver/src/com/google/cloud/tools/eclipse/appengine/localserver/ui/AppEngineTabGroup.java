@@ -21,24 +21,38 @@ import org.eclipse.debug.ui.AbstractLaunchConfigurationTabGroup;
 import org.eclipse.debug.ui.EnvironmentTab;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
+import org.eclipse.debug.ui.sourcelookup.SourceLookupTab;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.wst.server.ui.ServerLaunchConfigurationTab;
+import org.eclipse.jdt.debug.ui.launchConfigurations.JavaArgumentsTab;
+import org.eclipse.jdt.debug.ui.launchConfigurations.JavaClasspathTab;
 
+/**
+ *  Tabs shown in launch configurations for an App Engine Server.
+ *  To get to these in the UI:
+ *  
+ * 1. Open Servers view
+ * 2. Right click on the server to configure
+ * 3. Open
+ * 4. Open Launch Configuration
+ */
 public class AppEngineTabGroup extends AbstractLaunchConfigurationTabGroup {
 
   private static final String[] SERVER_TYPE_IDS = {LocalAppEngineServerDelegate.SERVER_TYPE_ID};
 
   @Override
   public void createTabs(ILaunchConfigurationDialog dialog, String mode) {
-    ILaunchConfigurationTab[] tabs = new ILaunchConfigurationTab[2];
+    ILaunchConfigurationTab[] tabs = new ILaunchConfigurationTab[5];
     tabs[0] = new AppEngineServerLaunchConfigurationTab(SERVER_TYPE_IDS);
     tabs[0].setLaunchConfigurationDialog(dialog);
     tabs[1] = new EnvironmentTab();
     tabs[1].setLaunchConfigurationDialog(dialog);
-
-    // see
-    // http://git.eclipse.org/c/jetty/org.eclipse.jetty.wtp.git/tree/org.eclipse.jst.server.jetty.ui/src/org/eclipse/jst/server/jetty/ui/internal/JettyLaunchConfigurationTabGroup.java
-    // for examples of other tabs we might want to add
+    tabs[2] = new JavaArgumentsTab();
+    tabs[2].setLaunchConfigurationDialog(dialog);
+    tabs[3] = new SourceLookupTab();
+    tabs[3].setLaunchConfigurationDialog(dialog);
+    tabs[4] = new JavaClasspathTab();
+    tabs[4].setLaunchConfigurationDialog(dialog);
 
     setTabs(tabs);
   }
