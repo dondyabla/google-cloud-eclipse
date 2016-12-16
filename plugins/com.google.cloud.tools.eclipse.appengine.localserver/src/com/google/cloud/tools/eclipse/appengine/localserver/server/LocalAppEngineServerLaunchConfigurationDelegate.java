@@ -100,7 +100,7 @@ public class LocalAppEngineServerLaunchConfigurationDelegate
         AnalyticsEvents.APP_ENGINE_LOCAL_SERVER_MODE, mode);
     
     validateCloudSdk();
-
+    
     IServer server = ServerUtil.getServer(configuration);
     if (server == null) {
       String message = "There is no App Engine development server available";
@@ -131,14 +131,19 @@ public class LocalAppEngineServerLaunchConfigurationDelegate
 
     new ServerLaunchMonitor(launch, server).engage();
 
+
+    String[] environmentVariables = getEnvironment(configuration);
+    
+    
     if (ILaunchManager.DEBUG_MODE.equals(mode)) {
       int debugPort = getDebugPort();
       setupDebugTarget(launch, debugPort, monitor);
-      serverBehaviour.startDebugDevServer(runnables, console.newMessageStream(), debugPort);
+      serverBehaviour.startDebugDevServer(runnables, console.newMessageStream(), debugPort,
+          environmentVariables);
     } else {
       // A launch must have at least one debug target or process, or it otherwise becomes a zombie
       LocalAppEngineServerDebugTarget.addTarget(launch, serverBehaviour);
-      serverBehaviour.startDevServer(runnables, console.newMessageStream());
+      serverBehaviour.startDevServer(runnables, console.newMessageStream(), environmentVariables);
     }
   }
 
