@@ -48,11 +48,11 @@ import org.xml.sax.SAXException;
 public class WebProjectUtil {
   // This is the folder created by default when the Dynamic Web Module facet is installed
   // (unless the user changes the default.)
-  private static final String DEFAULT_DYNAMIC_WEB_FACET_WEB_CONTENT_PATH = "/WebContent";
+  public static final Path DEFAULT_DYNAMIC_WEB_FACET_WEB_CONTENT_PATH = new Path("/WebContent");
 
-  private final static String DEFAULT_WEB_PATH = "src/main/webapp";
+  private static final String DEFAULT_WEB_PATH = "src/main/webapp";
 
-  private final static String WEB_INF = "WEB-INF/";
+  private static final String WEB_INF = "WEB-INF/";
 
   /**
    * Return the project's <code>WEB-INF</code> directory. There is no guarantee that the contents
@@ -108,14 +108,19 @@ public class WebProjectUtil {
     return webInfFolders;
   }
 
+  private static boolean hasMultipleWebInfFolder(IProject project) {
+    return findAllWebInfFolders(project).size() > 1;
+  }
+
   /**
-   * Returns the web content path set by the Dynamic Web Module facet. May return {@code null}.
+   * Returns the web content path setting designated by the Dynamic Web Module facet. May
+   * return {@code null}.
    *
    * The path information resides in an XML file, which a project settings file:
    * ".settings/org.eclipse.wst.common.component". This methods effectively returns the path
    * tagged with {@code "defaultRootSource"} in the XML file.
    */
-  private static IPath getWtpWebContentPathSetting(IProject project) {
+  private static IPath getDefaultWebRootFolder(IProject project) {
     IVirtualComponent component = ComponentCore.createComponent(project);
     if (component != null && component.exists()) {
       IVirtualFolder rootFolder = component.getRootFolder();
@@ -129,29 +134,30 @@ public class WebProjectUtil {
     return null;
   }
 
-  public static boolean isDefaultWebContentFolderBogus(IProject project) {
-    IPath webContentPath = getWtpWebContentPathSetting(project);
-    if (webContentPath == null) {
-      return false;
-    }
-    if (!webContentPath.equals(new Path(DEFAULT_DYNAMIC_WEB_FACET_WEB_CONTENT_PATH))) {
-      return false;
-    }
-    if (findAllWebInfFolders(project).size() == 1) {
+  public static boolean hasBogusWebRootFolder(IProject project) {
+    IPath webContentPath = getDefaultWebRootFolder(project);
+    if (!DEFAULT_DYNAMIC_WEB_FACET_WEB_CONTENT_PATH.equals(webContentPath)) {
       return false;
     }
 
-    IFolder contentRoot = project.getFolder(webContentPath);
-    return isWtpGeneratedWebContentRoot(contentRoot);
+    IFolder webContentFolder = project.getFolder(webContentPath);
+    if (!webContentFolder.exists()) {  // Also covers checking if it's actually a folder.
+      return false;
+    }
+
+    if (isWtpGeneratedWebContentRoot(webContentFolder) && hasMultipleWebInfFolder(project)) {
+      return true;
+    }
+    return false;
   }
 
-  private static boolean isWtpGeneratedWebContentRoot(IFolder contentRoot) {
+  private static boolean isWtpGeneratedWebContentRoot(IFolder webContentRoot) {
     try {
-      if (contentRoot.members().length != 2) {  // WEB-INF and META-INF should be the only two.
+      if (webContentRoot.members().length != 2) {  // WEB-INF and META-INF should be the only two.
         return false;
       }
-      IResource metaInf = contentRoot.findMember("/META-INF");
-      IResource webInf = contentRoot.findMember("/WEB-INF");
+      IResource metaInf = webContentRoot.findMember("/META-INF");
+      IResource webInf = webContentRoot.findMember("/WEB-INF");
       if (metaInf == null || webInf == null
           || metaInf.getType() != IResource.FOLDER || webInf.getType() != IResource.FOLDER) {
         return false;

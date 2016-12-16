@@ -26,7 +26,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
@@ -46,28 +45,37 @@ public class StandardFacetInstallDelegate extends AppEngineFacetInstallDelegate 
                       Object config,
                       IProgressMonitor monitor) throws CoreException {
     super.execute(project, version, config, monitor);
-    // If Dynamic Web facet was additionally installed together, it will have created "WebContent/"
-    // as the default webapp directory (unless the user changed the default when installing
-    // the Web facet). We detect if there already existed another webapp directory, and if so,
-    // fix the default webapp setting to point to the existing directory.
-    fixWebContentRootIfNecessary(project, monitor);
 
+    fixWebContentRootIfNecessary(project, monitor);
     createConfigFiles(project, monitor);
     installAppEngineRuntimes(project);
   }
 
+  /**
+   * Deletes the incorrect "/WebContent" (attributed to the fault of the Dynamic Web Module facet)
+   * and fixes the default webapp setting accordingly.
+   *
+   * If the Dynamic Web Module facet was installed together, it will have created the "/WebContent"
+   * folder with the default webapp structure (if the user did not change the default folder name
+   * when selecting the Web facet to install). This method detects if the project already had
+   * another genuine webapp directory, and if so, fixes the default webapp project setting
+   * to point to the existing webapp.
+   */
   private void fixWebContentRootIfNecessary(IProject project, IProgressMonitor monitor)
       throws CoreException {
-    if (WebProjectUtil.isDefaultWebContentFolderBogus(project)) {
-
-      // Fix/update webapp setting in ".settings/org.eclipse.wst.common.component" (XML). How? To figure out...
-      IVirtualComponent component = ComponentCore.createComponent(project /* of IProject */);
+    if (WebProjectUtil.hasBogusWebRootFolder(project)) {
+      IVirtualComponent component = ComponentCore.createComponent(project);
       if (component != null && component.exists()) {
         IVirtualFolder rootFolder = component.getRootFolder();
-        rootFolder.removeLink(new Path("/WebContent"), IVirtualFolder.FORCE, monitor);
+        // This removes the following entry in ".settings/org.eclipse.wst.common.component":
+        // <wb-resource deploy-path="/" source-path="/WebContent" tag="defaultRootSource"/>
+        rootFolder.removeLink(WebProjectUtil.DEFAULT_DYNAMIC_WEB_FACET_WEB_CONTENT_PATH,
+                              IVirtualFolder.FORCE, monitor);
       }
 
-      // Delete "WebContent" folder. (Skip this? But it's very confusing that this folder exists.)
+      // Delete "/WebContent" physically.
+      project.getFolder(WebProjectUtil.DEFAULT_DYNAMIC_WEB_FACET_WEB_CONTENT_PATH)
+        .delete(true /* force */, monitor);
     }
   }
 

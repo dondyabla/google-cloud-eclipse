@@ -16,13 +16,32 @@
 
 package com.google.cloud.tools.eclipse.appengine.deploy.ui.standard;
 
+import com.google.api.client.auth.oauth2.Credential;
+import com.google.cloud.tools.appengine.api.deploy.DefaultDeployConfiguration;
+import com.google.cloud.tools.eclipse.appengine.deploy.CleanupOldDeploysJob;
+import com.google.cloud.tools.eclipse.appengine.deploy.standard.StandardDeployJob;
+import com.google.cloud.tools.eclipse.appengine.deploy.standard.StandardDeployJobConfig;
+import com.google.cloud.tools.eclipse.appengine.deploy.standard.StandardDeployPreferences;
+import com.google.cloud.tools.eclipse.appengine.deploy.standard.StandardDeployPreferencesConverter;
+import com.google.cloud.tools.eclipse.appengine.deploy.ui.DeployConsole;
+import com.google.cloud.tools.eclipse.appengine.deploy.ui.DeployPreferencesDialog;
+import com.google.cloud.tools.eclipse.appengine.deploy.ui.Messages;
+import com.google.cloud.tools.eclipse.appengine.facets.WebProjectUtil;
+import com.google.cloud.tools.eclipse.appengine.login.IGoogleLoginService;
+import com.google.cloud.tools.eclipse.sdk.ui.MessageConsoleWriterOutputLineListener;
+import com.google.cloud.tools.eclipse.ui.util.MessageConsoleUtilities;
+import com.google.cloud.tools.eclipse.ui.util.ProjectFromSelectionHelper;
+import com.google.cloud.tools.eclipse.ui.util.ServiceUtils;
+import com.google.cloud.tools.eclipse.usagetracker.AnalyticsEvents;
+import com.google.cloud.tools.eclipse.usagetracker.AnalyticsPingManager;
+import com.google.cloud.tools.eclipse.util.FacetedProjectHelper;
+import com.google.common.annotations.VisibleForTesting;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.Locale;
-
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -40,26 +59,6 @@ import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsoleManager;
 import org.eclipse.ui.console.MessageConsoleStream;
 import org.eclipse.ui.handlers.HandlerUtil;
-
-import com.google.api.client.auth.oauth2.Credential;
-import com.google.cloud.tools.appengine.api.deploy.DefaultDeployConfiguration;
-import com.google.cloud.tools.eclipse.appengine.deploy.CleanupOldDeploysJob;
-import com.google.cloud.tools.eclipse.appengine.deploy.standard.StandardDeployJob;
-import com.google.cloud.tools.eclipse.appengine.deploy.standard.StandardDeployJobConfig;
-import com.google.cloud.tools.eclipse.appengine.deploy.standard.StandardDeployPreferences;
-import com.google.cloud.tools.eclipse.appengine.deploy.standard.StandardDeployPreferencesConverter;
-import com.google.cloud.tools.eclipse.appengine.deploy.ui.DeployConsole;
-import com.google.cloud.tools.eclipse.appengine.deploy.ui.DeployPreferencesDialog;
-import com.google.cloud.tools.eclipse.appengine.deploy.ui.Messages;
-import com.google.cloud.tools.eclipse.appengine.login.IGoogleLoginService;
-import com.google.cloud.tools.eclipse.sdk.ui.MessageConsoleWriterOutputLineListener;
-import com.google.cloud.tools.eclipse.ui.util.MessageConsoleUtilities;
-import com.google.cloud.tools.eclipse.ui.util.ProjectFromSelectionHelper;
-import com.google.cloud.tools.eclipse.ui.util.ServiceUtils;
-import com.google.cloud.tools.eclipse.usagetracker.AnalyticsEvents;
-import com.google.cloud.tools.eclipse.usagetracker.AnalyticsPingManager;
-import com.google.cloud.tools.eclipse.util.FacetedProjectHelper;
-import com.google.common.annotations.VisibleForTesting;
 
 /**
  * Command handler to deploy a web application project to App Engine Standard.
@@ -86,6 +85,11 @@ public class StandardDeployCommandHandler extends AbstractHandler {
   public Object execute(ExecutionEvent event) throws ExecutionException {
     try {
       IProject project = helper.getProject(event);
+      WebProjectUtil.hasBogusWebRootFolder(project);
+      if (true) {
+        return null;
+      }
+
       if (project != null) {
         if (!checkProjectErrors(project)) {
           MessageDialog.openInformation(HandlerUtil.getActiveShell(event),
@@ -144,7 +148,7 @@ public class StandardDeployCommandHandler extends AbstractHandler {
       }
     });
     deploy.schedule();
-    
+
     IConsoleManager consoleManager = ConsolePlugin.getDefault().getConsoleManager();
     consoleManager.showConsoleView(messageConsole);
   }
