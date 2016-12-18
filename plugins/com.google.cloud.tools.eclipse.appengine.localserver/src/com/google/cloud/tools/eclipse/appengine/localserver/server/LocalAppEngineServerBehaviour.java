@@ -216,7 +216,7 @@ public class LocalAppEngineServerBehaviour extends ServerBehaviourDelegate
    *
    * @param runnables the path to directories that contain configuration files like appengine-web.xml
    * @param console the stream (Eclipse console) to send development server process output to
-   * @param environmentVariables environment variables to pass to server
+   * @param environmentVariables environment variables to pass to server in form name=value
    */
   void startDevServer(List<File> runnables, MessageConsoleStream console, String[] environmentVariables)
       throws CoreException {
@@ -246,7 +246,8 @@ public class LocalAppEngineServerBehaviour extends ServerBehaviourDelegate
   /**
    * Starts the development server in debug mode.
    *
-   * @param runnables the path to directories that contain configuration files like appengine-web.xml
+   * @param runnables the path to directories that contain configuration files like
+   *        appengine-web.xml
    * @param console the stream (Eclipse console) to send development server process output to
    * @param debugPort the port to attach a debugger to if launch is in debug mode
    * @param environmentVariables environment variables to pass to server in form name=value
