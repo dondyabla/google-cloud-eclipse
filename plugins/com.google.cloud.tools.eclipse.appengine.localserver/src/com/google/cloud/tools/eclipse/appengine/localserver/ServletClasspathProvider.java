@@ -32,9 +32,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.inject.Inject;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.jdt.core.IClasspathEntry;
+import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jst.server.core.RuntimeClasspathProviderDelegate;
 import org.eclipse.wst.server.core.IRuntime;
 
@@ -69,7 +72,7 @@ public class ServletClasspathProvider extends RuntimeClasspathProviderDelegate {
     if (project != null && MavenUtils.hasMavenNature(project)) { // Maven handles its own classpath
       return null;
     } else {
-      return resolveClasspathContainer(runtime);
+      return doResolveClasspathContainer(project, runtime);
     }
   }
 
@@ -82,6 +85,10 @@ public class ServletClasspathProvider extends RuntimeClasspathProviderDelegate {
   // https://github.com/GoogleCloudPlatform/google-cloud-eclipse/issues/953
   @Override
   public IClasspathEntry[] resolveClasspathContainer(IRuntime runtime) {
+    return doResolveClasspathContainer(null, runtime);
+  }
+  
+  private IClasspathEntry[] doResolveClasspathContainer(IProject project, IRuntime runtime) {
     try {
       initializeLibraries(new LibraryFactory());
 
@@ -89,16 +96,16 @@ public class ServletClasspathProvider extends RuntimeClasspathProviderDelegate {
       List<LibraryFile> servletApiLibraryFiles = libraries.get("servlet-api").getLibraryFiles();
       Preconditions.checkState(servletApiLibraryFiles.size() == 1);
       LibraryFile servletApi = servletApiLibraryFiles.get(0);
-      IClasspathEntry servletApiEntry = service.getLibraryClasspathEntry(servletApi);
+      IClasspathEntry servletApiEntry = service.getLibraryClasspathEntry(null, servletApi);
 
       // jsp api is assumed to be a single file
       List<LibraryFile> jspApiLibraryFiles = libraries.get("jsp-api").getLibraryFiles();
       Preconditions.checkState(jspApiLibraryFiles.size() == 1);
       LibraryFile jspApi = jspApiLibraryFiles.get(0);
-      IClasspathEntry jspApiEntry = service.getLibraryClasspathEntry(jspApi);
+      IClasspathEntry jspApiEntry = service.getLibraryClasspathEntry(null, jspApi);
 
       return new IClasspathEntry[] { servletApiEntry, jspApiEntry };
-    } catch (LibraryRepositoryServiceException e) {
+    } catch (LibraryRepositoryServiceException ex) {
       return null;
     }
   }
@@ -120,4 +127,12 @@ public class ServletClasspathProvider extends RuntimeClasspathProviderDelegate {
       }
     }
   }
+
+  private static class NonJavaProjectException extends Exception {
+
+    public NonJavaProjectException(IProject project) {
+      super("Not a java project: " + project.getName());
+    }
+  }
+
 }

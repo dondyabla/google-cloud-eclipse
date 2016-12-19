@@ -46,6 +46,6 @@ public class FileDownloaderTest {
   @Test(expected = IOException.class)
   public void testDownload_cannotCreateDownloadFolder() throws IOException {
     FileDownloader fileDownloader = new FileDownloader(new Path("/dev/null/foo"));
-    fileDownloader.download(new URL("http://google.com"));
+    fileDownloader.download(new URL("http://example.com/dummy.zip"));
   }
 }

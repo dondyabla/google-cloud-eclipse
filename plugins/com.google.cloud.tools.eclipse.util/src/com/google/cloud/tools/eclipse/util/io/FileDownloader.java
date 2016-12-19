@@ -63,9 +63,12 @@ public class FileDownloader {
    */
   public IPath download(URL url) throws IOException {
     Preconditions.checkNotNull(url, "url is null");
+    String lastSegment = new Path(url.getPath()).lastSegment();
+    Preconditions.checkNotNull(lastSegment, "last segment is null");
+    Preconditions.checkArgument(!lastSegment.isEmpty(), "last segment is empty string");
     ensureDownloadFolderExists();
 
-    File downloadedFile = downloadFolderPath.append(new Path(url.getPath()).lastSegment()).toFile();
+    File downloadedFile = downloadFolderPath.append(lastSegment).toFile();
     URLConnection connection = url.openConnection();
     connection.setConnectTimeout(DEFAULT_CONNECT_TIMEOUT_MS);
     connection.setReadTimeout(DEFAULT_READ_TIMEOUT_MS);

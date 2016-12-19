@@ -26,6 +26,7 @@ import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jdt.core.IClasspathContainer;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
@@ -41,6 +42,7 @@ public final class TestProjectCreator extends ExternalResource {
   private IJavaProject javaProject;
   private String containerPath;
   private List<IProjectFacetVersion> projectFacetVersions = new ArrayList<>();
+  private IClasspathContainer container;
 
   public TestProjectCreator withClasspathContainerPath(String containerPath) {
     this.containerPath = containerPath;

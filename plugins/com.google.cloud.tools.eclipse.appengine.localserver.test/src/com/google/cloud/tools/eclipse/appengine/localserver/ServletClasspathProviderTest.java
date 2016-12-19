@@ -18,6 +18,7 @@ package com.google.cloud.tools.eclipse.appengine.localserver;
 
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -31,6 +32,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IClasspathEntry;
+import org.eclipse.jdt.core.IJavaProject;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -64,7 +66,7 @@ public class ServletClasspathProviderTest {
 
   @Test
   public void testResolveClasspathContainerThrowsError() throws LibraryRepositoryServiceException {
-    when(repositoryService.getLibraryClasspathEntry(any(LibraryFile.class)))
+    when(repositoryService.getLibraryClasspathEntry(any(IJavaProject.class), any(LibraryFile.class)))
       .thenThrow(new LibraryRepositoryServiceException("test exception"));
     assertNull(provider.resolveClasspathContainer(null, null));
   }
@@ -83,7 +85,7 @@ public class ServletClasspathProviderTest {
     servletApi.setLibraryFiles(Collections.singletonList(libraryFile));
     IClasspathEntry classpathEntry = mock(IClasspathEntry.class);
     when(classpathEntry.getPath()).thenReturn(new Path("/path/to/" + libraryId + ".jar"));
-    when(repositoryService.getLibraryClasspathEntry(libraryFile)).thenReturn(classpathEntry);
+    when(repositoryService.getLibraryClasspathEntry(any(IJavaProject.class), eq(libraryFile))).thenReturn(classpathEntry);
     return servletApi;
   }
 }

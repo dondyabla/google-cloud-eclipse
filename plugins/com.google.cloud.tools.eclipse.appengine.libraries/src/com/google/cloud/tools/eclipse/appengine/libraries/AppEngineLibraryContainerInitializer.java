@@ -104,7 +104,7 @@ public class AppEngineLibraryContainerInitializer extends ClasspathContainerInit
       try {
         LibraryClasspathContainer container = serializer.loadContainer(project, containerPath);
         if (container != null) {
-          validateJarPaths(container);
+          validateJarPaths(project, container);
           JavaCore.setClasspathContainer(containerPath, new IJavaProject[] {project},
                                          new IClasspathContainer[] {container}, null);
         }
@@ -117,14 +117,14 @@ public class AppEngineLibraryContainerInitializer extends ClasspathContainerInit
     }
   }
 
-  private void validateJarPaths(LibraryClasspathContainer container) throws LibraryRepositoryServiceException {
+  private void validateJarPaths(IJavaProject javaProject, LibraryClasspathContainer container) throws LibraryRepositoryServiceException {
     IClasspathEntry[] classpathEntries = container.getClasspathEntries();
     for (int i = 0; i < classpathEntries.length; i++) {
       IClasspathEntry classpathEntry = classpathEntries[i];
       if (!classpathEntry.getPath().toFile().exists()
           || (classpathEntry.getSourceAttachmentPath() != null
               && !classpathEntry.getSourceAttachmentPath().toFile().exists())) {
-        classpathEntries[i] = repositoryService.rebuildClasspathEntry(classpathEntry);
+        classpathEntries[i] = repositoryService.rebuildClasspathEntry(javaProject, classpathEntry);
       }
     }
   }
@@ -142,4 +142,9 @@ public class AppEngineLibraryContainerInitializer extends ClasspathContainerInit
       }
     }
   }
+
+  @Override
+  public IClasspathContainer getFailureContainer(IPath containerPath, IJavaProject project) {
+    return null;
+  }  
 }

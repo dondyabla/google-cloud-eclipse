@@ -79,7 +79,7 @@ public class AppEngineLibraryContainerInitializerTest {
 
   @Before
   public void setUp() throws Exception {
-    when(repositoryService.rebuildClasspathEntry(any(IClasspathEntry.class)))
+    when(repositoryService.rebuildClasspathEntry(any(IJavaProject.class), any(IClasspathEntry.class)))
       .thenAnswer(fakeClasspathEntry());
     setupLibraryFactory();
     setupSerializer();
@@ -226,7 +226,7 @@ public class AppEngineLibraryContainerInitializerTest {
     return new Answer<IClasspathEntry>() {
       @Override
       public IClasspathEntry answer(InvocationOnMock invocation) throws Throwable {
-        return invocation.getArgumentAt(0, IClasspathEntry.class);
+        return invocation.getArgumentAt(1, IClasspathEntry.class);
       }
     };
   }

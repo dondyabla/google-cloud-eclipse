@@ -127,7 +127,7 @@ public class AppEngineLibraryContainerResolverJob extends Job {
     IClasspathEntry[] entries = new IClasspathEntry[libraryFiles.size()];
     int idx = 0;
     for (LibraryFile libraryFile : libraryFiles) {
-      entries[idx++] = repositoryService.getLibraryClasspathEntry(libraryFile);
+      entries[idx++] = repositoryService.getLibraryClasspathEntry(javaProject, libraryFile);
       child.worked(1);
     }
     monitor.done();

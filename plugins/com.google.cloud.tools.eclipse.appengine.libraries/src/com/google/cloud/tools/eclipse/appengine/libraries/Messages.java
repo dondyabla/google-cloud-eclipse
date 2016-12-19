@@ -25,7 +25,8 @@ public class Messages extends NLS {
   public static String ContainerPathNotTwoSegments;
   public static String CreateLibraryError;
   public static String LoadContainerFailed;
-  public static String RepositoryCannotBeLocated;
+  public static String M2SourceAttachmentDownloaderJobName;
+  public static String RemoteFileSourceAttachmentDownloaderJobName;
   public static String RepositoryUriInvalid;
   public static String RepositoryUriNotAbsolute;
   public static String ResolveArtifactError;

@@ -56,4 +56,8 @@ public class LibraryClasspathContainer implements IClasspathContainer {
   public IClasspathEntry[] getClasspathEntries() {
     return classpathEntries;
   }
+
+  public void updateEntry(int idx, IClasspathEntry classpathEntry) {
+    classpathEntries[idx] = classpathEntry;
+  }
 }

@@ -19,6 +19,7 @@ package com.google.cloud.tools.eclipse.appengine.libraries.repository;
 import com.google.cloud.tools.eclipse.appengine.libraries.model.LibraryFile;
 import com.google.cloud.tools.eclipse.appengine.libraries.model.MavenCoordinates;
 import org.eclipse.jdt.core.IClasspathEntry;
+import org.eclipse.jdt.core.IJavaProject;
 
 /**
  * Service interface for obtaining local paths for artifacts described by {@link MavenCoordinates}
@@ -34,7 +35,7 @@ public interface ILibraryRepositoryService {
    * @throws LibraryRepositoryServiceException if the classpath entry cannot be created, e.g. cannot be resolved based
    * on the Maven coordinates or because of a network problem
    */
-  IClasspathEntry getLibraryClasspathEntry(LibraryFile libraryFile) throws LibraryRepositoryServiceException;
+  IClasspathEntry getLibraryClasspathEntry(IJavaProject javaProject, LibraryFile libraryFile) throws LibraryRepositoryServiceException;
 
   /**
    * Returns a new {@link IClasspathEntry} instance with the kind {@link IClasspathEntry#CPE_LIBRARY} which has the
@@ -42,5 +43,5 @@ public interface ILibraryRepositoryService {
    *
    * @throws LibraryRepositoryServiceException if the artifact resolution fails.
    */
-  IClasspathEntry rebuildClasspathEntry(IClasspathEntry classpathEntry) throws LibraryRepositoryServiceException;
+  IClasspathEntry rebuildClasspathEntry(IJavaProject javaProject, IClasspathEntry classpathEntry) throws LibraryRepositoryServiceException;
 }
