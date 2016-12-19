@@ -28,7 +28,6 @@ import com.google.common.base.CharMatcher;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Paths;
-import java.text.MessageFormat;
 import java.util.Collection;
 import org.eclipse.aether.repository.RepositoryPolicy;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -56,10 +55,11 @@ import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.PlatformUI;
 
 /**
- * UI to collect all information necessary to create a new Maven-based App Engine Standard Java
- * project.
+ * UI to collect all information necessary to create a new Maven-based App Engine Standard 
+ * environment Java project.
  */
 public class MavenAppEngineStandardWizardPage extends WizardPage {
 
@@ -110,6 +110,9 @@ public class MavenAppEngineStandardWizardPage extends WizardPage {
     Composite container = new Composite(parent, SWT.NONE);
     GridLayoutFactory.swtDefaults().numColumns(2).applyTo(container);
     setControl(container);
+
+    PlatformUI.getWorkbench().getHelpSystem().setHelp(container,
+        "com.google.cloud.tools.eclipse.appengine.newproject.maven.NewMavenProjectContext"); //$NON-NLS-1$
 
     createLocationArea(container);
     createMavenCoordinatesArea(container);
@@ -190,6 +193,8 @@ public class MavenAppEngineStandardWizardPage extends WizardPage {
     Label groupIdLabel = new Label(mavenCoordinatesGroup, SWT.NONE);
     groupIdLabel.setText(Messages.getString("GROUP_ID")); //$NON-NLS-1$
     groupIdField = new Text(mavenCoordinatesGroup, SWT.BORDER);
+    groupIdField.setToolTipText(Messages.getString("GROUP_ID_TOOLTIP")); //$NON-NLS-1$
+
     GridDataFactory.defaultsFor(groupIdField).align(SWT.FILL, SWT.CENTER).applyTo(groupIdField);
     groupIdField.addModifyListener(pageValidator);
     groupIdField.addModifyListener(new AutoPackageNameSetterOnGroupIdChange());
@@ -197,6 +202,8 @@ public class MavenAppEngineStandardWizardPage extends WizardPage {
     Label artifactIdLabel = new Label(mavenCoordinatesGroup, SWT.NONE);
     artifactIdLabel.setText(Messages.getString("ARTIFACT_ID")); //$NON-NLS-1$
     artifactIdField = new Text(mavenCoordinatesGroup, SWT.BORDER);
+    artifactIdField.setToolTipText(Messages.getString("ARTIFACT_ID_TOOLTIP")); //$NON-NLS-1$
+    
     GridDataFactory.defaultsFor(artifactIdField).align(SWT.FILL, SWT.CENTER)
         .applyTo(artifactIdField);
     artifactIdField.addModifyListener(pageValidator);
@@ -287,7 +294,7 @@ public class MavenAppEngineStandardWizardPage extends WizardPage {
     String globalUpdatePolicy = MavenPlugin.getMavenConfiguration().getGlobalUpdatePolicy();
     if (!appEngineLibrariesSelectorGroup.getSelectedLibraries().isEmpty()
         && RepositoryPolicy.UPDATE_POLICY_NEVER.equals(globalUpdatePolicy)) {
-      setMessage(Messages.getString("M2E_GLOBAL_UPDATES_PREVENT_CHECKS"), WARNING);
+      setMessage(Messages.getString("M2E_GLOBAL_UPDATES_PREVENT_CHECKS"), WARNING); //$NON-NLS-1$
     }
   }
 
@@ -302,13 +309,14 @@ public class MavenAppEngineStandardWizardPage extends WizardPage {
         FilePermissions.verifyDirectoryCreatable(path);
         return true;
       } catch (FileAlreadyExistsException ex) {
-          String message = MessageFormat.format(Messages.getString("FILE_LOCATION"), location); //$NON-NLS-1$
+          String message = Messages.getString("FILE_LOCATION", location); //$NON-NLS-1$
           page.setMessage(message, ERROR);
-          return false;  
+          return false;
       } catch (IOException ex) {
-        String message = MessageFormat.format(Messages.getString("INVALID_PATH"), location); //$NON-NLS-1$
+        String message = Messages.getString(
+            "INVALID_PATH", location, ex.getLocalizedMessage()); //$NON-NLS-1$
         page.setMessage(message, ERROR);
-        return false;  
+        return false;
       }
     }
   }
@@ -330,7 +338,7 @@ public class MavenAppEngineStandardWizardPage extends WizardPage {
     String artifactId = getArtifactId();
     IPath path = getLocationPath().append(artifactId);
     if (path.toFile().exists()) {
-      String errorMessage = MessageFormat.format(Messages.getString("LOCATION_ALREADY_EXISTS"), path); //$NON-NLS-1$
+      String errorMessage = Messages.getString("LOCATION_ALREADY_EXISTS", path); //$NON-NLS-1$
       setErrorMessage(errorMessage);
       return false;
     }
@@ -343,7 +351,7 @@ public class MavenAppEngineStandardWizardPage extends WizardPage {
       setMessage(Messages.getString("PROVIDE_GROUP_ID"), INFORMATION); //$NON-NLS-1$
       return false;
     } else if (!MavenCoordinatesValidator.validateGroupId(groupId)) {
-      setErrorMessage(MessageFormat.format(Messages.getString("ILLEGAL_GROUP_ID"), groupId)); //$NON-NLS-1$
+      setErrorMessage(Messages.getString("ILLEGAL_GROUP_ID", groupId)); //$NON-NLS-1$
       return false;
     }
     String artifactId = getArtifactId();
@@ -351,7 +359,7 @@ public class MavenAppEngineStandardWizardPage extends WizardPage {
       setMessage(Messages.getString("PROVIDE_ARTIFACT_ID"), INFORMATION); //$NON-NLS-1$
       return false;
     } else if (!MavenCoordinatesValidator.validateArtifactId(artifactId)) {
-      setErrorMessage(Messages.getString("ILLEGAL_ARTIFACT_ID") + artifactId); //$NON-NLS-1$
+      setErrorMessage(Messages.getString("ILLEGAL_ARTIFACT_ID", artifactId)); //$NON-NLS-1$
       return false;
     }
     String version = getVersion();
@@ -370,7 +378,7 @@ public class MavenAppEngineStandardWizardPage extends WizardPage {
     IStatus status = JavaPackageValidator.validate(packageName);
     if (!status.isOK()) {
       String details = status.getMessage() == null ? packageName : status.getMessage();
-      String message = MessageFormat.format(Messages.getString("ILLEGAL_PACKAGE_NAME"), details); //$NON-NLS-1$
+      String message = Messages.getString("ILLEGAL_PACKAGE_NAME", details); //$NON-NLS-1$
       setErrorMessage(message);
       return false;
     }

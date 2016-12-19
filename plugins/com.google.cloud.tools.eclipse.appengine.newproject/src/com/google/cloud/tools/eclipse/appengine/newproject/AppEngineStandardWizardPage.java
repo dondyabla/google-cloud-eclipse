@@ -25,13 +25,15 @@ import java.io.File;
 import java.util.Collection;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
 
 /**
@@ -44,13 +46,11 @@ public class AppEngineStandardWizardPage extends WizardNewProjectCreationPage {
 
   public AppEngineStandardWizardPage() {
     super("basicNewProjectPage"); //$NON-NLS-1$
-    this.setTitle(Messages.getString("app.engine.standard.project")); //$NON-NLS-1$
-    this.setDescription(Messages.getString("create.app.engine.standard.project")); //$NON-NLS-1$
-
-    this.setImageDescriptor(AppEngineImages.appEngine(64));
+    setTitle(Messages.getString("app.engine.standard.project")); //$NON-NLS-1$
+    setDescription(Messages.getString("create.app.engine.standard.project")); //$NON-NLS-1$
+    setImageDescriptor(AppEngineImages.appEngine(64));
   }
 
-  // todo is there a way to call this for a test?
   @Override
   public void createControl(Composite parent) {
     super.createControl(parent);
@@ -60,26 +60,45 @@ public class AppEngineStandardWizardPage extends WizardNewProjectCreationPage {
         AnalyticsEvents.APP_ENGINE_NEW_PROJECT_WIZARD_TYPE_NATIVE, parent.getShell());
 
     Composite container = (Composite) getControl();
+    PlatformUI.getWorkbench().getHelpSystem().setHelp(container,
+        "com.google.cloud.tools.eclipse.appengine.newproject.NewProjectContext"); //$NON-NLS-1$
 
-    ModifyListener pageValidator = new PageValidator();
-
-    // Java package name
-    Label packageNameLabel = new Label(container, SWT.NONE);
-    packageNameLabel.setText(Messages.getString("java.package")); //$NON-NLS-1$
-    javaPackageField = new Text(container, SWT.BORDER);
-    GridData javaPackagePosition = new GridData(GridData.FILL_HORIZONTAL);
-    javaPackagePosition.horizontalSpan = 2;
-    javaPackageField.setLayoutData(javaPackagePosition);
-    javaPackageField.addModifyListener(pageValidator);
+    createPackageField(container);
 
     // Manage APIs
     appEngineLibrariesSelectorGroup = new AppEngineLibrariesSelectorGroup(container);
 
+    setPageComplete(validatePage());
+    // Show enter project name on opening
+    setErrorMessage(null);
+    setMessage(Messages.getString("enter.project.name"));
+    
     Dialog.applyDialogFont(container);
+  }
+
+  // Java package name
+  private void createPackageField(Composite container) {
+    
+    Composite composite = new Composite(container, SWT.NONE);
+    // assumed that container has a single-column GridLayout
+    GridDataFactory.fillDefaults().applyTo(composite);
+
+    Label packageNameLabel = new Label(composite, SWT.LEAD);
+    packageNameLabel.setText(Messages.getString("java.package")); //$NON-NLS-1$
+    javaPackageField = new Text(composite, SWT.BORDER);
+    
+    ModifyListener pageValidator = new PageValidator();
+    javaPackageField.addModifyListener(pageValidator);
+
+    GridDataFactory.fillDefaults().grab(true, false).applyTo(javaPackageField);
+    GridLayoutFactory.swtDefaults().numColumns(2).applyTo(composite);
   }
 
   @Override
   public boolean validatePage() {
+    setErrorMessage(null);
+    setMessage(null);
+    
     if (!super.validatePage()) {
       return false;
     }
@@ -93,7 +112,7 @@ public class AppEngineStandardWizardPage extends WizardNewProjectCreationPage {
     if (!packageStatus.isOK()) {
       String message = Messages.getString("illegal.package.name",  //$NON-NLS-1$
           packageStatus.getMessage());
-      setErrorMessage(message); 
+      setErrorMessage(message);
       return false;
     }
 
@@ -115,7 +134,7 @@ public class AppEngineStandardWizardPage extends WizardNewProjectCreationPage {
   }
 
   public String getPackageName() {
-    return this.javaPackageField.getText();
+    return javaPackageField.getText();
   }
 
   public Collection<Library> getSelectedLibraries() {

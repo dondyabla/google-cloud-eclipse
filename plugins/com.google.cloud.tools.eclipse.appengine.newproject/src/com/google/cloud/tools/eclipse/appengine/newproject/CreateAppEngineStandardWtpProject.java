@@ -66,11 +66,11 @@ class CreateAppEngineStandardWtpProject extends WorkspaceModifyOperation {
   @Override
   public void execute(IProgressMonitor monitor) throws InvocationTargetException, CoreException {
     IWorkspace workspace = ResourcesPlugin.getWorkspace();
-    final IProject newProject = config.getProject();
+    IProject newProject = config.getProject();
     URI location = config.getEclipseProjectLocationUri();
 
     String name = newProject.getName();
-    final IProjectDescription description = workspace.newProjectDescription(name);
+    IProjectDescription description = workspace.newProjectDescription(name);
     description.setLocationURI(location);
     SubMonitor subMonitor = SubMonitor.convert(monitor,
         Messages.getString("creating.app.engine.standard.project"), 100); //$NON-NLS-1$
@@ -87,8 +87,6 @@ class CreateAppEngineStandardWtpProject extends WorkspaceModifyOperation {
         newProject, true, subMonitor.newChild(2));
     AppEngineStandardFacet.installAppEngineFacet(
         facetedProject, true /* installDependentFacets */, subMonitor.newChild(2));
-    AppEngineStandardFacet.installAllAppEngineRuntimes(facetedProject, true /* force */,
-        subMonitor.newChild(2));
 
     addAppEngineLibrariesToBuildPath(newProject, config.getAppEngineLibraries(),
         subMonitor.newChild(2));

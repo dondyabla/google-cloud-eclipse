@@ -19,7 +19,7 @@
         <artifactId>tycho-surefire-plugin</artifactId>
         <configuration>
           <useUIHarness>true</useUIHarness>
-          <useUIThread>false</useUIThread>
+          <useUIThread>true</useUIThread>
           <product>org.eclipse.platform.ide</product>
         </configuration>
       </plugin>
@@ -36,28 +36,33 @@
                 <versionRange>0.0.0</versionRange>
               </requirement>
               <requirement>
+                <type>eclipse-plugin</type>
+                <id>ch.qos.logback.slf4j</id>
+                <versionRange>0.0.0</versionRange>
+              </requirement>
+              <requirement>
                 <type>eclipse-feature</type>
                 <id>org.eclipse.m2e.feature</id>
                 <versionRange>0.0.0</versionRange>
               </requirement>
               <requirement>
                 <type>eclipse-feature</type>
-                <id>org.eclipse.jst.web_sdk.feature</id>
+                <id>org.eclipse.jst.web_ui.feature</id>
                 <versionRange>0.0.0</versionRange>
               </requirement>
               <requirement>
                 <type>eclipse-feature</type>
-                <id>org.eclipse.jst.common.fproj.enablement.jdt.sdk</id>
+                <id>org.eclipse.jst.common.fproj.enablement.jdt</id>
                 <versionRange>0.0.0</versionRange>
               </requirement>
               <requirement>
                 <type>eclipse-feature</type>
-                <id>org.eclipse.wst.common.fproj.sdk</id>
+                <id>org.eclipse.wst.common.fproj</id>
                 <versionRange>0.0.0</versionRange>
               </requirement>
               <requirement>
                 <type>eclipse-feature</type>
-                <id>org.eclipse.wst.server_adapters.sdk.feature</id>
+                <id>org.eclipse.wst.server_adapters.feature</id>
                 <versionRange>0.0.0</versionRange>
               </requirement>
               <requirement>
@@ -72,5 +77,3 @@
     </plugins>
   </build>
 </project>
-
-

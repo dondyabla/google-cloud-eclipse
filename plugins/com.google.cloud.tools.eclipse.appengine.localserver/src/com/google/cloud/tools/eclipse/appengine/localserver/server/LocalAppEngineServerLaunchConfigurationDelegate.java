@@ -71,6 +71,9 @@ public class LocalAppEngineServerLaunchConfigurationDelegate
   private final static Logger logger =
       Logger.getLogger(LocalAppEngineServerLaunchConfigurationDelegate.class.getName());
 
+  public static final String[] SUPPORTED_LAUNCH_MODES =
+      {ILaunchManager.RUN_MODE, ILaunchManager.DEBUG_MODE};
+
   private static final String DEBUGGER_HOST = "localhost"; //$NON-NLS-1$
 
   private static void validateCloudSdk() throws CoreException  {
@@ -103,6 +106,10 @@ public class LocalAppEngineServerLaunchConfigurationDelegate
       String message = "There is no App Engine development server available";
       Status status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, message);
       throw new CoreException(status);
+    } else if (server.getServerState() != IServer.STATE_STOPPED) {
+      String message = "Server is already in operation";
+      Status status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, message);
+      throw new CoreException(status);
     }
     IModule[] modules = server.getModules();
     if (modules == null || modules.length == 0) {
@@ -130,7 +137,7 @@ public class LocalAppEngineServerLaunchConfigurationDelegate
 
     if (ILaunchManager.DEBUG_MODE.equals(mode)) {
       int debugPort = getDebugPort();
-      setupDebugTarget(launch, configuration, debugPort, monitor);
+      setupDebugTarget(launch, debugPort, monitor);
       serverBehaviour.startDebugDevServer(runnables, console.newMessageStream(), debugPort);
     } else {
       // A launch must have at least one debug target or process, or it otherwise becomes a zombie
@@ -179,7 +186,7 @@ public class LocalAppEngineServerLaunchConfigurationDelegate
     openJob.schedule();
   }
 
-  private void setupDebugTarget(ILaunch launch, ILaunchConfiguration configuration, int port,
+  private void setupDebugTarget(ILaunch launch, int port,
       IProgressMonitor monitor) throws CoreException {
     // The 4.7 listen connector supports a connectionLimit
     IVMConnector connector =
