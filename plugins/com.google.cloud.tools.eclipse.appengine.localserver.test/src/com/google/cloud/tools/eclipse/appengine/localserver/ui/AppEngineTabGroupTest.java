@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.eclipse.appengine.localserver.ui;
 
+import org.eclipse.debug.ui.ILaunchConfigurationTab;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -26,8 +27,10 @@ public class AppEngineTabGroupTest {
     AppEngineTabGroup group = new AppEngineTabGroup();
     group.createTabs(null, "");
     Assert.assertEquals("Server", group.getTabs()[0].getName());
-    Assert.assertEquals("Environment", group.getTabs()[1].getName());
-    Assert.assertEquals("Arguments", group.getTabs()[2].getName());
+    Assert.assertEquals("Arguments", group.getTabs()[1].getName());
+    for (ILaunchConfigurationTab tab : group.getTabs()) {
+      Assert.assertNotNull(tab);
+    }
   }
 
 }
