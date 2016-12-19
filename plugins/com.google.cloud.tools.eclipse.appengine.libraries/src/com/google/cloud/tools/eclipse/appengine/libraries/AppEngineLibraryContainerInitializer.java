@@ -142,9 +142,4 @@ public class AppEngineLibraryContainerInitializer extends ClasspathContainerInit
       }
     }
   }
-
-  @Override
-  public IClasspathContainer getFailureContainer(IPath containerPath, IJavaProject project) {
-    return null;
-  }  
 }

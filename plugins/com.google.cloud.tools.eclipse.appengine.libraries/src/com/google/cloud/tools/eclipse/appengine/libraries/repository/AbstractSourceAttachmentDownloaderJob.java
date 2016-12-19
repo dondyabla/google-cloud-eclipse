@@ -18,6 +18,7 @@ import org.eclipse.jdt.core.IClasspathContainer;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.JavaModelException;
 
 public abstract class AbstractSourceAttachmentDownloaderJob extends Job {
 
@@ -72,32 +73,22 @@ public abstract class AbstractSourceAttachmentDownloaderJob extends Job {
 
   protected abstract IPath getSourcePath();
 
+  /**
+   * Finds the library entry with path matching {@link #classpathEntryPath} and sets the source attachment path to
+   * <code>sourcePath</code>
+   */
   private void setSourceAttachmentPath(IJavaProject javaProject, IPath sourcePath, IProgressMonitor monitor) throws IOException, CoreException {
     IClasspathEntry[] rawClasspath = javaProject.getRawClasspath();
     for (int i = 0; i < rawClasspath.length; i++) {
-      IClasspathEntry entry = rawClasspath[i];
-      if (entry.getEntryKind() == IClasspathEntry.CPE_CONTAINER) {
-        IClasspathContainer container = JavaCore.getClasspathContainer(entry.getPath(), javaProject);
-        if (container instanceof LibraryClasspathContainer) {
-          LibraryClasspathContainer libraryContainer = (LibraryClasspathContainer) container;
-          IClasspathEntry[] classpathEntries = libraryContainer.getClasspathEntries();
-          for (int j = 0; j < classpathEntries.length; j++) {
-            IClasspathEntry libraryEntry = libraryContainer.getClasspathEntries()[j];
-            if (libraryEntry.getPath().equals(classpathEntryPath)) {
-              classpathEntries[j] = JavaCore.newLibraryEntry(libraryEntry.getPath(),
-                                                                           sourcePath,
-                                                                           null,
-                                                                           libraryEntry.getAccessRules(),
-                                                                           libraryEntry.getExtraAttributes(),
-                                                                           libraryEntry.isExported());
-              LibraryClasspathContainer newLibraryContainer = new LibraryClasspathContainer(libraryContainer.getPath(),
-                                                                                      libraryContainer.getDescription(),
-                                                                                      classpathEntries);
-              JavaCore.setClasspathContainer(libraryContainer.getPath(), new IJavaProject[]{ javaProject },
-                                             new IClasspathContainer[]{ newLibraryContainer }, monitor);
-              serializer.saveContainer(javaProject, newLibraryContainer);
-              return;
-            }
+      // this method can return null for uninitialized LibraryClasspathContainer instances, in that case
+      // this jobs gets rescheduled to let JDT initialize the container in the meantime
+      LibraryClasspathContainer libraryContainer = getLibraryClasspathContainer(rawClasspath[i]);
+      if (libraryContainer != null) {
+        IClasspathEntry[] classpathEntries = libraryContainer.getClasspathEntries();
+        for (int j = 0; j < classpathEntries.length; j++) {
+          if (classpathEntries[j].getPath().equals(classpathEntryPath)) {
+            setSourceAttachmentPathForEntry(javaProject, sourcePath, monitor, libraryContainer, classpathEntries, j);
+            return;
           }
         }
       }
@@ -107,6 +98,37 @@ public abstract class AbstractSourceAttachmentDownloaderJob extends Job {
     } else {
       new CoreException(StatusUtil.error(this, "Could not set source attachment path"));
     }
+  }
+
+  /**
+   * Returns the {@link LibraryClasspathContainer} corresponding to the {@link IClasspathEntry} if one exists, otherwise
+   * <code>null</code>
+   */
+  private LibraryClasspathContainer getLibraryClasspathContainer(IClasspathEntry entry) throws JavaModelException {
+    if (entry.getEntryKind() == IClasspathEntry.CPE_CONTAINER) {
+      IClasspathContainer container = JavaCore.getClasspathContainer(entry.getPath(), javaProject);
+      if (container instanceof LibraryClasspathContainer) {
+        return (LibraryClasspathContainer) container;
+      }
+    }
+    return null;
+  }
+
+  private void setSourceAttachmentPathForEntry(IJavaProject javaProject, IPath sourcePath, IProgressMonitor monitor,
+      LibraryClasspathContainer libraryContainer, IClasspathEntry[] classpathEntries, int j)
+      throws JavaModelException, IOException, CoreException {
+    classpathEntries[j] = JavaCore.newLibraryEntry(classpathEntries[j].getPath(),
+                                                   sourcePath,
+                                                   null,
+                                                   classpathEntries[j].getAccessRules(),
+                                                   classpathEntries[j].getExtraAttributes(),
+                                                   classpathEntries[j].isExported());
+    LibraryClasspathContainer newLibraryContainer = new LibraryClasspathContainer(libraryContainer.getPath(),
+                                                                                  libraryContainer.getDescription(),
+                                                                                  classpathEntries);
+    JavaCore.setClasspathContainer(libraryContainer.getPath(), new IJavaProject[]{ javaProject },
+                                   new IClasspathContainer[]{ newLibraryContainer }, monitor);
+    serializer.saveContainer(javaProject, newLibraryContainer);
   }
 
   protected IJavaProject getJavaProject() {

@@ -158,10 +158,28 @@ public class M2RepositoryService implements ILibraryRepositoryService {
     }
   }
 
-  private IPath getSourceLocation(final MavenCoordinates mavenCoordinates, final URL sourceUrl, final IJavaProject javaProject, final IPath classpathEntryPath) {
+  /**
+   * Determines the source artifact's path by delegating to either M2Eclipse or a {@link FileDownloader}.
+   * <p>
+   * If <code>javaProject</code> is null, the source artifact path resolution is synchronous and the path is returned,
+   * otherwise a background job is created that will do the resolution and <code>null</code> is returned.
+   * @param mavenCoordinates determines the artifact whose sources need to be resolved
+   * @param sourceUrl optional URL pointing to a remote location hosting the source artifact, if <code>null</code> then
+   * the <code>mavenCoordinates</code> will be used with classifier <code>source</code> to obtain the sources
+   * @param javaProject the project that owns the classpath entry that needs to be updated
+   * @param classpathEntryPath the path of the classpath entry that needs to be updated
+   * @return
+   */
+  private IPath getSourceLocation(final MavenCoordinates mavenCoordinates,
+                                  final URL sourceUrl,
+                                  final IJavaProject javaProject,
+                                  final IPath classpathEntryPath) {
     if (sourceUrl == null) {
       if (javaProject != null) {
-        sourceDownloaderJobFactory.createM2SourceDownloaderJob(javaProject, mavenCoordinates, classpathEntryPath, mavenHelper).schedule();
+        sourceDownloaderJobFactory.createM2SourceDownloaderJob(javaProject,
+                                                               mavenCoordinates,
+                                                               classpathEntryPath,
+                                                               mavenHelper).schedule();
         return null;
       } else {
         // without project the async job wouldn't know where to add the downloaded jar, let's resolve it synchronized
@@ -169,7 +187,10 @@ public class M2RepositoryService implements ILibraryRepositoryService {
       }
     } else {
       if (javaProject != null) {
-        sourceDownloaderJobFactory.createRemoteFileSourceDownloaderJob(javaProject, classpathEntryPath, mavenCoordinates, sourceUrl).schedule();
+        sourceDownloaderJobFactory.createRemoteFileSourceDownloaderJob(javaProject,
+                                                                       classpathEntryPath,
+                                                                       mavenCoordinates,
+                                                                       sourceUrl).schedule();
         return null;
       } else {
         // without project the async job wouldn't know where to add the downloaded jar, let's resolve it synchronized
@@ -205,6 +226,7 @@ public class M2RepositoryService implements ILibraryRepositoryService {
         .append(mavenCoordinates.getVersion()).toFile();
     return new Path(downloadedSources.getAbsolutePath());
   }
+
   private static IAccessRule[] getAccessRules(List<Filter> filters) {
     IAccessRule[] accessRules = new IAccessRule[filters.size()];
     int idx = 0;
