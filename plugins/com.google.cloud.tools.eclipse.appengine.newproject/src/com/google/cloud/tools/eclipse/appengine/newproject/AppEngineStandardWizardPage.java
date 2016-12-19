@@ -26,10 +26,11 @@ import java.util.Collection;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.layout.GridDataFactory;
-import org.eclipse.swt.widgets.Composite;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
@@ -79,7 +80,6 @@ public class AppEngineStandardWizardPage extends WizardNewProjectCreationPage {
   private void createPackageField(Composite container) {
     
     Composite composite = new Composite(container, SWT.NONE);
-
     // assumed that container has a single-column GridLayout
     GridDataFactory.fillDefaults().applyTo(composite);
 
@@ -91,6 +91,7 @@ public class AppEngineStandardWizardPage extends WizardNewProjectCreationPage {
     javaPackageField.addModifyListener(pageValidator);
 
     GridDataFactory.fillDefaults().grab(true, false).applyTo(javaPackageField);
+    GridLayoutFactory.swtDefaults().numColumns(2).applyTo(composite);
   }
 
   @Override
