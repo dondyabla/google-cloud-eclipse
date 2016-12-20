@@ -18,6 +18,7 @@ package com.google.cloud.tools.eclipse.appengine.facets;
 
 import com.google.cloud.tools.eclipse.util.io.ResourceUtils;
 import com.google.cloud.tools.eclipse.util.templates.appengine.AppEngineTemplateUtility;
+import com.google.common.base.Stopwatch;
 import java.io.ByteArrayInputStream;
 import java.util.Collections;
 import org.eclipse.core.resources.IFile;
@@ -32,6 +33,7 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.wst.common.project.facet.core.IFacetedProject;
 import org.eclipse.wst.common.project.facet.core.IFacetedProjectWorkingCopy;
+import org.eclipse.wst.common.project.facet.core.IProjectFacet;
 import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
 import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
 
@@ -46,11 +48,6 @@ public class StandardFacetInstallDelegate extends AppEngineFacetInstallDelegate 
     super.execute(project, version, config, monitor);
     createConfigFiles(project, monitor);
     installAppEngineRuntimes(project);
-    try {
-      Thread.sleep(2000);
-    } catch (InterruptedException ex) {
-      System.out.println("Interrupted!");
-    }
   }
 
   private void installAppEngineRuntimes(IProject project) throws CoreException {
@@ -58,7 +55,7 @@ public class StandardFacetInstallDelegate extends AppEngineFacetInstallDelegate 
     // so schedule a job as a workaround.
     IFacetedProject facetedProject = ProjectFacetsManager.create(project);
     final Job installJob = new InstallAppEngineRuntimesJob(facetedProject);
-    installJob.schedule(10);
+    installJob.schedule();
   }
 
   /**
@@ -90,6 +87,8 @@ public class StandardFacetInstallDelegate extends AppEngineFacetInstallDelegate 
   private class InstallAppEngineRuntimesJob extends WorkspaceJob {
     private IFacetedProject project;
     private IFacetedProjectWorkingCopy snapshot;
+    private long delayTime = 50;
+    private Stopwatch timer = Stopwatch.createStarted();
 
     InstallAppEngineRuntimesJob(IFacetedProject project) {
       super("Install App Engine runtimes in " + project.getProject().getName());
@@ -99,15 +98,16 @@ public class StandardFacetInstallDelegate extends AppEngineFacetInstallDelegate 
 
     @Override
     public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
-      System.out.printf(">> JOB: StandardFacetInstallDelegate.installAppEngineRuntimes(%s)\n",
-          project);
       try {
-        if (snapshot.isDirty()) {
+        IProjectFacet jsdt = ProjectFacetsManager.getProjectFacet("wst.jsdt.web");
+        if (snapshot.isDirty() || !snapshot.hasProjectFacet(jsdt)) {
+          System.out.printf(">> InstallAppEngineRuntimesJob[%s]: is dirty, will try again\n",
+              timer);
           snapshot.revertChanges();
-          snapshot = project.createWorkingCopy();
-          schedule(10);
+          schedule(delayTime);
           return Status.OK_STATUS;
         }
+        System.out.printf(">> InstallAppEngineRuntimesJob[%s]: GO: installing runtimes\n", timer);
         AppEngineStandardFacet.installAllAppEngineRuntimes(project, monitor);
         snapshot.dispose();
         return Status.OK_STATUS;
