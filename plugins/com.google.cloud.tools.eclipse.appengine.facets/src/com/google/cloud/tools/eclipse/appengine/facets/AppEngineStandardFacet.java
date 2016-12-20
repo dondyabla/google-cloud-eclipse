@@ -105,7 +105,7 @@ public class AppEngineStandardFacet {
   }
 
   /**
-   * Checks to see if <code>facetedProject</code> has the App Engine standard facet. 
+   * Checks to see if <code>facetedProject</code> has the App Engine standard facet.
    * If not, it installs the App Engine standard facet.
    *
    * @param facetedProject the faceted project receiving the App Engine facet
@@ -116,9 +116,9 @@ public class AppEngineStandardFacet {
    */
   public static void installAppEngineFacet(IFacetedProject facetedProject,
       boolean installDependentFacets, IProgressMonitor monitor) throws CoreException {
-    
+
     SubMonitor subMonitor = SubMonitor.convert(monitor, 100);
-    
+
     // Install required App Engine facets i.e. Java 1.7 and Dynamic Web Module 2.5
     if (installDependentFacets) {
       installJavaFacet(facetedProject, subMonitor.newChild(20));

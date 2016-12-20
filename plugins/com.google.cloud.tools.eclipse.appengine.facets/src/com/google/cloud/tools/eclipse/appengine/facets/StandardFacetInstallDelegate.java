@@ -21,6 +21,7 @@ import com.google.cloud.tools.eclipse.util.templates.appengine.AppEngineTemplate
 import com.google.common.base.Stopwatch;
 import java.io.ByteArrayInputStream;
 import java.util.Collections;
+import java.util.concurrent.Semaphore;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -28,6 +29,7 @@ import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
@@ -51,6 +53,9 @@ public class StandardFacetInstallDelegate extends AppEngineFacetInstallDelegate 
   }
 
   private void installAppEngineRuntimes(IProject project) throws CoreException {
+    ConvertJob simulatedConvertJob = new ConvertJob(project);
+    simulatedConvertJob.schedule();
+
     // Modifying targeted runtimes while installing/uninstalling facets is not allowed,
     // so schedule a job as a workaround.
     IFacetedProject facetedProject = ProjectFacetsManager.create(project);
@@ -84,6 +89,9 @@ public class StandardFacetInstallDelegate extends AppEngineFacetInstallDelegate 
     progress.worked(6);
   }
 
+  Semaphore waitUntilConvertJobTakesEmptySnapshot = new Semaphore(0);
+  Semaphore waitUntilInstallJobInstallsFacet = new Semaphore(0);
+
   private class InstallAppEngineRuntimesJob extends WorkspaceJob {
     private IFacetedProject project;
     private IFacetedProjectWorkingCopy snapshot;
@@ -98,6 +106,11 @@ public class StandardFacetInstallDelegate extends AppEngineFacetInstallDelegate 
 
     @Override
     public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
+      if (waitUntilConvertJobTakesEmptySnapshot.availablePermits() == 0) {
+        System.out.println("ConvertJob hasn't taken a snapshot yet. Will wail until it does.");
+      }
+      waitUntilConvertJobTakesEmptySnapshot.acquireUninterruptibly();
+
       try {
         IProjectFacet jsdt = ProjectFacetsManager.getProjectFacet("wst.jsdt.web");
         if (snapshot.isDirty() || !snapshot.hasProjectFacet(jsdt)) {
@@ -107,9 +120,15 @@ public class StandardFacetInstallDelegate extends AppEngineFacetInstallDelegate 
           schedule(delayTime);
           return Status.OK_STATUS;
         }
+
         System.out.printf(">> InstallAppEngineRuntimesJob[%s]: GO: installing runtimes\n", timer);
         AppEngineStandardFacet.installAllAppEngineRuntimes(project, monitor);
         snapshot.dispose();
+
+        System.out.println("InstallJob: installed App Engine runtime.");
+        System.out.println("InstallJob: will wake up ConvertJob to overwrite the runtime list.");
+        waitUntilInstallJobInstallsFacet.release();
+
         return Status.OK_STATUS;
       } catch (CoreException ex) {
         return ex.getStatus();
@@ -117,4 +136,67 @@ public class StandardFacetInstallDelegate extends AppEngineFacetInstallDelegate 
     }
   };
 
+  class ConvertJob extends WorkspaceJob {
+    //final static String JSDT_FACET = "wst.jsdt.web";
+    private IProject fProject;
+    //private boolean fInstall = true;
+    //private boolean fUseExplicitWorkingCopy = false;
+
+    ConvertJob(IProject project /*, boolean install, boolean useExplicitWorkingCopy */) {
+      super("My simulated ConvertJob");
+      fProject = project;
+      //fInstall = install;
+      //fUseExplicitWorkingCopy = useExplicitWorkingCopy;
+    }
+
+    @Override
+    public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
+      //try {
+        //IProjectFacet projectFacet = ProjectFacetsManager.getProjectFacet(JSDT_FACET);
+        IFacetedProject facetedProject = ProjectFacetsManager.create(fProject);
+
+        //if (facetedProject != null && fProject.isAccessible()) {
+        //  if (fInstall) {
+        //    IProjectFacetVersion latestVersion = projectFacet.getLatestVersion();
+        //    facetedProject.installProjectFacet(latestVersion, null, monitor);
+        //  }
+
+
+        //  if (fUseExplicitWorkingCopy) {
+            IFacetedProjectWorkingCopy copy = facetedProject.createWorkingCopy();
+        //    Set fixed = new HashSet(facetedProject.getFixedProjectFacets());
+        //    fixed.add(projectFacet);
+        //    copy.setFixedProjectFacets(fixed);
+
+            System.out.println("ConvertJob: took a snapshot with an empty runtime list.");
+            assert (copy.getTargetableRuntimes().isEmpty());
+            waitUntilConvertJobTakesEmptySnapshot.release(99999);
+
+            System.out.println("ConvertJob: will wait until installJob installs App Engine runtime.");
+            waitUntilInstallJobInstallsFacet.acquireUninterruptibly();
+
+            copy.commitChanges(new NullProgressMonitor());
+            copy.dispose();
+
+            System.out.println("ConvertJob: reset the runtime list. It's empty now.");
+            waitUntilInstallJobInstallsFacet.acquireUninterruptibly();
+        //  }
+        //  else {
+        //    Set fixed = new HashSet(facetedProject.getFixedProjectFacets());
+        //    if (!fixed.contains(projectFacet)) {
+        //      fixed.add(projectFacet);
+        //      facetedProject.setFixedProjectFacets(fixed);
+        //    }
+        //  }
+        //}
+      //}
+      //catch (IllegalArgumentException e) {
+        // unknown facet ID, bad installation configuration?
+      //}
+      //catch (Exception e) {
+      //  Logger.logException(e);
+      //}
+      return Status.OK_STATUS;
+    }
+  }
 }
