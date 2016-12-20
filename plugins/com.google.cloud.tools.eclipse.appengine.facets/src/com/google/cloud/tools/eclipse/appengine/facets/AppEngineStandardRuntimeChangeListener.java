@@ -40,23 +40,30 @@ public class AppEngineStandardRuntimeChangeListener implements IFacetedProjectLi
     // PRIMARY_RUNTIME_CHANGED occurs in scenarios such as selecting runtimes on the
     // "New Faceted Project" wizard and the "New Dynamic Web Project" wizard.
     // IFacetedProjectEvent.Type.TARGETED_RUNTIMES_CHANGED does not happen
+    System.out.printf("AppEngineStandardRuntimeChangeListener: event=%s\n", event.getType());
     if (event.getType() != IFacetedProjectEvent.Type.PRIMARY_RUNTIME_CHANGED) {
       return;
     }
 
     IPrimaryRuntimeChangedEvent runtimeChangeEvent = (IPrimaryRuntimeChangedEvent)event;
     final IRuntime newRuntime = runtimeChangeEvent.getNewPrimaryRuntime();
+    System.out.printf("AppEngineStandardRuntimeChangeListener: newRuntime=%s\n", newRuntime);
     if (newRuntime == null) {
       return;
     }
 
     if (!AppEngineStandardFacet.isAppEngineStandardRuntime(newRuntime)) {
+      System.out.printf("AppEngineStandardRuntimeChangeListener: skipping: not an AES Runtime\n",
+          newRuntime);
       return;
     }
 
     // Check if the App Engine facet has been installed in the project
     final IFacetedProject facetedProject = runtimeChangeEvent.getProject();
     if (AppEngineStandardFacet.hasAppEngineFacet(facetedProject)) {
+      System.out.printf(
+          "AppEngineStandardRuntimeChangeListener: skipping as project has AppEngineFacet: %s\n",
+          facetedProject);
       return;
     }
 
@@ -70,17 +77,30 @@ public class AppEngineStandardRuntimeChangeListener implements IFacetedProjectLi
         IStatus installStatus = Status.OK_STATUS;
 
         try {
+          System.out.printf(
+              ">> AppEngineStandardRuntimeChangeListener: about to installAppEngineFacet(%s, noDepFacets)\n",
+              facetedProject);
           AppEngineStandardFacet.installAppEngineFacet(facetedProject, false /* installDependentFacets */, monitor);
+          System.out.printf(
+              "<< OK: installAppEngineFacet(%s, noDepFacets)\n",
+              facetedProject);
           return installStatus;
         } catch (CoreException ex1) {
+          System.out.printf("++ EX: installAppEngineFacet: %s\n", ex1);
           // Displays missing constraints that prevented facet installation
           installStatus = ex1.getStatus();
+          System.out.printf(
+              "++ EX: installAppEngineFacet: installStatus=%s\n",
+              installStatus);
 
           // Remove App Engine as primary runtime
           try {
+            System.out.printf(">>> About to remove targeted runtime: %s\n", newRuntime);
             facetedProject.removeTargetedRuntime(newRuntime, monitor);
+            System.out.printf("<<< OK: removed targeted runtime: %s\n", newRuntime);
             return installStatus;
           } catch (CoreException ex2) {
+            System.out.printf("+++ EX: unable to targeted runtime: %s\n", ex2);
             MultiStatus multiStatus;
             if (installStatus instanceof MultiStatus) {
               multiStatus = (MultiStatus) installStatus;
@@ -94,7 +114,6 @@ public class AppEngineStandardRuntimeChangeListener implements IFacetedProjectLi
         }
 
       }
-
     };
     addFacetJob.schedule();
   }
