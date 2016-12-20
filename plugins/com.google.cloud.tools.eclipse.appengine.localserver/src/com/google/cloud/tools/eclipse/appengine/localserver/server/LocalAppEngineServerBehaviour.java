@@ -238,9 +238,12 @@ public class LocalAppEngineServerBehaviour extends ServerBehaviourDelegate
    *
    * @param runnables the path to directories that contain configuration files like appengine-web.xml
    * @param console the stream (Eclipse console) to send development server process output to
+   * @param arguments JVM arguments to pass to the dev server
    */
-  void startDevServer(List<File> runnables, MessageConsoleStream console)
+  void startDevServer(List<File> runnables, MessageConsoleStream console, List<String> arguments)
       throws CoreException {
+    //todo pass along arguments
+    
     checkAndSetPorts();  // Must be called before setting the STARTING state.
     setServerState(IServer.STATE_STARTING);
 
@@ -271,8 +274,10 @@ public class LocalAppEngineServerBehaviour extends ServerBehaviourDelegate
    *        appengine-web.xml
    * @param console the stream (Eclipse console) to send development server process output to
    * @param debugPort the port to attach a debugger to if launch is in debug mode
+   * @param arguments JVM arguments to pass to the dev server
    */
-  void startDebugDevServer(List<File> runnables, MessageConsoleStream console, int debugPort)
+  void startDebugDevServer(List<File> runnables, MessageConsoleStream console, int debugPort, 
+      List<String> arguments)
       throws CoreException {
     checkAndSetPorts();  // Must be called before setting the STARTING state.
     setServerState(IServer.STATE_STARTING);
@@ -280,6 +285,9 @@ public class LocalAppEngineServerBehaviour extends ServerBehaviourDelegate
     // Create dev app server instance
     initializeDevServer(console);
 
+    //todo pass along arguments
+
+    
     // Create run configuration
     DefaultRunConfiguration devServerRunConfiguration = new DefaultRunConfiguration();
     devServerRunConfiguration.setAutomaticRestart(false);

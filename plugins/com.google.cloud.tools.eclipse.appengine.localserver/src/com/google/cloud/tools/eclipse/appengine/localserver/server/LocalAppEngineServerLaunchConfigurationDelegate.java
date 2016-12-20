@@ -135,19 +135,19 @@ public class LocalAppEngineServerLaunchConfigurationDelegate
 
     new ServerLaunchMonitor(launch, server).engage();
 
-
-    String[] environmentVariables = getEnvironment(configuration);
+    String programArguments = getProgramArguments(configuration);
+    String vmArgumentString = getVMArguments(configuration);
+    // these strings are exactly as supplied by the user in the dialog box
     
-    
+    List<String> arguments = null;
     if (ILaunchManager.DEBUG_MODE.equals(mode)) {
       int debugPort = getDebugPort();
       setupDebugTarget(launch, debugPort, monitor);
-      serverBehaviour.startDebugDevServer(runnables, console.newMessageStream(), debugPort,
-          environmentVariables);
+      serverBehaviour.startDebugDevServer(runnables, console.newMessageStream(), debugPort, arguments );
     } else {
       // A launch must have at least one debug target or process, or it otherwise becomes a zombie
       LocalAppEngineServerDebugTarget.addTarget(launch, serverBehaviour);
-      serverBehaviour.startDevServer(runnables, console.newMessageStream(), environmentVariables);
+      serverBehaviour.startDevServer(runnables, console.newMessageStream(), arguments);
     }
   }
 
