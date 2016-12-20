@@ -26,11 +26,11 @@ public class AppEngineTabGroupTest {
   public void testCreateTabs() {
     AppEngineTabGroup group = new AppEngineTabGroup();
     group.createTabs(null, "");
-    Assert.assertEquals("Server", group.getTabs()[0].getName());
-    Assert.assertEquals("Arguments", group.getTabs()[1].getName());
     for (ILaunchConfigurationTab tab : group.getTabs()) {
       Assert.assertNotNull(tab);
     }
+    Assert.assertEquals("Server", group.getTabs()[0].getName());
+    Assert.assertEquals("Arguments", group.getTabs()[1].getName());
   }
 
 }
