@@ -42,6 +42,9 @@ import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
 public class StandardFacetInstallDelegate extends AppEngineFacetInstallDelegate {
   private final static String APPENGINE_WEB_XML = "appengine-web.xml";
 
+  private Semaphore waitUntilConvertJobTakesEmptySnapshot;
+  private Semaphore waitUntilInstallJobInstallsFacet;
+
   @Override
   public void execute(IProject project,
                       IProjectFacetVersion version,
@@ -53,6 +56,9 @@ public class StandardFacetInstallDelegate extends AppEngineFacetInstallDelegate 
   }
 
   private void installAppEngineRuntimes(IProject project) throws CoreException {
+    waitUntilConvertJobTakesEmptySnapshot = new Semaphore(0);
+    waitUntilInstallJobInstallsFacet = new Semaphore(0);
+
     ConvertJob simulatedConvertJob = new ConvertJob(project);
     simulatedConvertJob.schedule();
 
@@ -88,9 +94,6 @@ public class StandardFacetInstallDelegate extends AppEngineFacetInstallDelegate 
         Collections.<String, String>emptyMap());
     progress.worked(6);
   }
-
-  Semaphore waitUntilConvertJobTakesEmptySnapshot = new Semaphore(0);
-  Semaphore waitUntilInstallJobInstallsFacet = new Semaphore(0);
 
   private class InstallAppEngineRuntimesJob extends WorkspaceJob {
     private IFacetedProject project;
@@ -179,7 +182,6 @@ public class StandardFacetInstallDelegate extends AppEngineFacetInstallDelegate 
             copy.dispose();
 
             System.out.println("ConvertJob: reset the runtime list. It's empty now.");
-            waitUntilInstallJobInstallsFacet.acquireUninterruptibly();
         //  }
         //  else {
         //    Set fixed = new HashSet(facetedProject.getFixedProjectFacets());
