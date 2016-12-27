@@ -122,10 +122,11 @@ public class AppEngineStandardFacet {
     SubMonitor subMonitor = SubMonitor.convert(monitor, 100);
 
     // https://github.com/GoogleCloudPlatform/google-cloud-eclipse/issues/1155
-    // We install facets in a batch so that we continue to hold a lock until we finish installing
-    // all the facets. This makes the first ConvertJob install the JSDT facet only after the batch
-    // is complete, which in turn prevents the first ConvertJob from scheduling the second
-    // ConvertJob (triggered by installing the JSDT facet.)
+    // Instead of using "IFacetedProject.installProjectFacet()", we install facets in a batch
+    // using "IFacetedProject.modify()" so that we keeping holding a lock until we finish
+    // installing all the facets. This makes the first ConvertJob install the JSDT facet only
+    // after the batch is complete, which in turn prevents the first ConvertJob from scheduling
+    // the second ConvertJob (triggered by installing the JSDT facet.)
     Set<IFacetedProject.Action> facetInstallBatchQueue = new HashSet<>();
     // Install required App Engine facets i.e. Java 1.7 and Dynamic Web Module 2.5
     if (installDependentFacets) {
@@ -142,6 +143,7 @@ public class AppEngineStandardFacet {
       facetInstallBatchQueue.add(new IFacetedProject.Action(
           IFacetedProject.Action.Type.INSTALL, appEngineFacetVersion, config));
       facetedProject.modify(facetInstallBatchQueue, subMonitor.newChild(100));
+      facetedProject.installProjectFacet(fv, config, subMonitor);
     }
   }
 
