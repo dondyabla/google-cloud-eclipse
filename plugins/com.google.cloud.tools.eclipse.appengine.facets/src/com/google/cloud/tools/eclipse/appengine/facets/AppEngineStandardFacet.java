@@ -20,7 +20,9 @@ import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.eclipse.util.FacetedProjectHelper;
 import com.google.common.base.Preconditions;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -105,7 +107,7 @@ public class AppEngineStandardFacet {
   }
 
   /**
-   * Checks to see if <code>facetedProject</code> has the App Engine standard facet. 
+   * Checks to see if <code>facetedProject</code> has the App Engine standard facet.
    * If not, it installs the App Engine standard facet.
    *
    * @param facetedProject the faceted project receiving the App Engine facet
@@ -116,13 +118,19 @@ public class AppEngineStandardFacet {
    */
   public static void installAppEngineFacet(IFacetedProject facetedProject,
       boolean installDependentFacets, IProgressMonitor monitor) throws CoreException {
-    
+
     SubMonitor subMonitor = SubMonitor.convert(monitor, 100);
-    
+
+    // https://github.com/GoogleCloudPlatform/google-cloud-eclipse/issues/1155
+    // We install facets in a batch so that we continue to hold a lock until we finish installing
+    // all the facets. This makes the first ConvertJob install the JSDT facet only after the batch
+    // is complete, which in turn prevents the first ConvertJob from scheduling the second
+    // ConvertJob (triggered by installing the JSDT facet.)
+    Set<IFacetedProject.Action> facetInstallBatchQueue = new HashSet<>();
     // Install required App Engine facets i.e. Java 1.7 and Dynamic Web Module 2.5
     if (installDependentFacets) {
-      installJavaFacet(facetedProject, subMonitor.newChild(20));
-      installWebFacet(facetedProject, subMonitor.newChild(30));
+      addJavaFacetToBatchQueue(facetedProject, facetInstallBatchQueue);
+      addWebFacetToBatchQueue(facetedProject, facetInstallBatchQueue);
     }
 
     IProjectFacet appEngineFacet = ProjectFacetsManager.getProjectFacet(AppEngineStandardFacet.ID);
@@ -131,7 +139,9 @@ public class AppEngineStandardFacet {
 
     if (!facetedProject.hasProjectFacet(appEngineFacet)) {
       Object config = null;
-      facetedProject.installProjectFacet(appEngineFacetVersion, config, subMonitor.newChild(50));
+      facetInstallBatchQueue.add(new IFacetedProject.Action(
+          IFacetedProject.Action.Type.INSTALL, appEngineFacetVersion, config));
+      facetedProject.modify(facetInstallBatchQueue, subMonitor.newChild(100));
     }
   }
 
@@ -206,7 +216,8 @@ public class AppEngineStandardFacet {
   /**
    * Installs Java 1.7 facet if it doesn't already exist in <code>factedProject</code>
    */
-  private static void installJavaFacet(IFacetedProject facetedProject, IProgressMonitor monitor)
+  private static void addJavaFacetToBatchQueue(IFacetedProject facetedProject,
+      Set<IFacetedProject.Action> batchQueue)
       throws CoreException {
     if (facetedProject.hasProjectFacet(JavaFacet.VERSION_1_7)) {
       return;
@@ -218,13 +229,15 @@ public class AppEngineStandardFacet {
     sourcePaths.add(new Path("src/main/java"));
     sourcePaths.add(new Path("src/test/java"));
     javaConfig.setSourceFolders(sourcePaths);
-    facetedProject.installProjectFacet(JavaFacet.VERSION_1_7, javaConfig, monitor);
+    batchQueue.add(new IFacetedProject.Action(
+        IFacetedProject.Action.Type.INSTALL, JavaFacet.VERSION_1_7, javaConfig));
   }
 
   /**
    * Installs Dynamic Web Module 2.5 facet if it doesn't already exits in <code>factedProject</code>
    */
-  private static void installWebFacet(IFacetedProject facetedProject, IProgressMonitor monitor)
+  private static void addWebFacetToBatchQueue(IFacetedProject facetedProject,
+      Set<IFacetedProject.Action> batchQueue)
       throws CoreException {
     if (facetedProject.hasProjectFacet(WebFacetUtils.WEB_25)) {
       return;
@@ -235,7 +248,8 @@ public class AppEngineStandardFacet {
     webModel.setBooleanProperty(IJ2EEFacetInstallDataModelProperties.GENERATE_DD, false);
     webModel.setBooleanProperty(IWebFacetInstallDataModelProperties.INSTALL_WEB_LIBRARY, false);
     webModel.setStringProperty(IWebFacetInstallDataModelProperties.CONFIG_FOLDER, "src/main/webapp");
-    facetedProject.installProjectFacet(WebFacetUtils.WEB_25, webModel, monitor);
+    batchQueue.add(new IFacetedProject.Action(
+        IFacetedProject.Action.Type.INSTALL, WebFacetUtils.WEB_25, webModel));
   }
 
   private static org.eclipse.wst.server.core.IRuntime[] getAppEngineRuntimes() {

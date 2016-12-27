@@ -30,6 +30,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.wst.common.project.facet.core.IFacetedProject;
+import org.eclipse.wst.common.project.facet.core.IProjectFacet;
 import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
 import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
 
@@ -46,22 +47,43 @@ public class StandardFacetInstallDelegate extends AppEngineFacetInstallDelegate 
     installAppEngineRuntimes(project);
   }
 
-  private void installAppEngineRuntimes(final IProject project) {
+  private void installAppEngineRuntimes(final IProject project) throws CoreException {
+    // https://github.com/GoogleCloudPlatform/google-cloud-eclipse/issues/1155
+    final FutureJobSuspender jobSuspender = new FutureJobSuspender();
+    final IFacetedProject facetedProject = ProjectFacetsManager.create(project);
+
     // Modifying targeted runtimes while installing/uninstalling facets is not allowed,
     // so schedule a job as a workaround.
     Job installJob = new Job("Install App Engine runtimes in " + project.getName()) {
       @Override
       protected IStatus run(IProgressMonitor monitor) {
+        // https://github.com/GoogleCloudPlatform/google-cloud-eclipse/issues/1155
+        // Wait until the first ConvertJob installs the JSDT facet.
+        IProjectFacet jsdtFacet = ProjectFacetsManager.getProjectFacet("wst.jsdt.web");
+        if (!facetedProject.isFixedProjectFacet(jsdtFacet)) {
+          System.out.println("JSDT not added yet.");
+          schedule(100 /* ms */);
+          return Status.OK_STATUS;
+        }
+
         try {
-          IFacetedProject facetedProject = ProjectFacetsManager.create(project);
           AppEngineStandardFacet.installAllAppEngineRuntimes(facetedProject, monitor);
           return Status.OK_STATUS;
         } catch (CoreException ex) {
           return ex.getStatus();
+        } finally {
+          // Now resume all the suspended jobs (including the second ConvertJob).
+          jobSuspender.resume();
         }
       }
     };
-    installJob.schedule();
+    jobSuspender.addExceptionalJob(installJob);
+    // https://github.com/GoogleCloudPlatform/google-cloud-eclipse/issues/1155
+    // The first ConvertJob has already been scheduled (which installs JSDT facet), and
+    // this is to suspend the second ConvertJob temporarily.
+    jobSuspender.suspendFutureJobs();
+    // The first ConvertJob is scheduled to run after 1 second, so no need to hurry.
+    installJob.schedule(800 /* ms */);
   }
 
   /**
