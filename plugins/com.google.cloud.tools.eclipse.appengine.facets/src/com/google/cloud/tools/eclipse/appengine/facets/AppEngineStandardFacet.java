@@ -143,7 +143,6 @@ public class AppEngineStandardFacet {
       facetInstallBatchQueue.add(new IFacetedProject.Action(
           IFacetedProject.Action.Type.INSTALL, appEngineFacetVersion, config));
       facetedProject.modify(facetInstallBatchQueue, subMonitor.newChild(100));
-      facetedProject.installProjectFacet(fv, config, subMonitor);
     }
   }
 
