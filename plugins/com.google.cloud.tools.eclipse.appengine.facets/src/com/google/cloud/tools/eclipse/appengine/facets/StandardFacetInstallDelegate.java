@@ -61,7 +61,6 @@ public class StandardFacetInstallDelegate extends AppEngineFacetInstallDelegate 
         // Wait until the first ConvertJob installs the JSDT facet.
         IProjectFacet jsdtFacet = ProjectFacetsManager.getProjectFacet("wst.jsdt.web");
         if (!facetedProject.isFixedProjectFacet(jsdtFacet)) {
-          System.out.println("JSDT not added yet.");
           schedule(100 /* ms */);
           return Status.OK_STATUS;
         }
