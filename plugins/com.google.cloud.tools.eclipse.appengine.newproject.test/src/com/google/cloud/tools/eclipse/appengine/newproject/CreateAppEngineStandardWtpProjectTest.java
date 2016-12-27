@@ -77,9 +77,11 @@ public class CreateAppEngineStandardWtpProjectTest {
 
   @Test
   public void testUnitTestCreated() throws InvocationTargetException, CoreException {
-    CreateAppEngineStandardWtpProject creator = new CreateAppEngineStandardWtpProject(config, adaptable);
+    CreateAppEngineStandardWtpProject creator =
+        new CreateAppEngineStandardWtpProject(config, adaptable);
     creator.execute(new NullProgressMonitor());
 
+    ProjectUtils.waitUntilIdle();  // App Engine runtime is added via a Job, so wait.
     assertJunitAndHamcrestAreOnClasspath();
   }
 
@@ -101,8 +103,11 @@ public class CreateAppEngineStandardWtpProjectTest {
 
   @Test
   public void testMostImportantFile() throws InvocationTargetException, CoreException {
-    CreateAppEngineStandardWtpProject creator = new CreateAppEngineStandardWtpProject(config, adaptable);
+    CreateAppEngineStandardWtpProject creator =
+        new CreateAppEngineStandardWtpProject(config, adaptable);
     creator.execute(new NullProgressMonitor());
+
+    ProjectUtils.waitUntilIdle();  // App Engine runtime is added via a Job, so wait.
     assertEquals("HelloAppEngine.java", creator.getMostImportant().getName());
   }
 
@@ -120,8 +125,11 @@ public class CreateAppEngineStandardWtpProjectTest {
   public void testAppEngineLibrariesAdded() throws InvocationTargetException, CoreException {
     Library library = new Library(APP_ENGINE_API);
     config.setAppEngineLibraries(Collections.singletonList(library));
-    CreateAppEngineStandardWtpProject creator = new CreateAppEngineStandardWtpProject(config, adaptable);
+    CreateAppEngineStandardWtpProject creator =
+        new CreateAppEngineStandardWtpProject(config, adaptable);
     creator.execute(new NullProgressMonitor());
+
+    ProjectUtils.waitUntilIdle();  // App Engine runtime is added via a Job, so wait.
     assertAppEngineContainerOnClasspath(library);
   }
 

@@ -51,7 +51,6 @@ public class StandardFacetInstallDelegate extends AppEngineFacetInstallDelegate 
     // https://github.com/GoogleCloudPlatform/google-cloud-eclipse/issues/1155
     final FutureJobSuspender jobSuspender = new FutureJobSuspender();
     final IFacetedProject facetedProject = ProjectFacetsManager.create(project);
-    final IProjectFacet jsdtFacet = ProjectFacetsManager.getProjectFacet("wst.jsdt.web");
 
     // Modifying targeted runtimes while installing/uninstalling facets is not allowed,
     // so schedule a job as a workaround.
@@ -60,9 +59,14 @@ public class StandardFacetInstallDelegate extends AppEngineFacetInstallDelegate 
       protected IStatus run(IProgressMonitor monitor) {
         // https://github.com/GoogleCloudPlatform/google-cloud-eclipse/issues/1155
         // Wait until the first ConvertJob installs the JSDT facet.
-        if (!facetedProject.isFixedProjectFacet(jsdtFacet)) {
-          schedule(100 /* ms */);
-          return Status.OK_STATUS;
+        try {
+          IProjectFacet jsdtFacet = ProjectFacetsManager.getProjectFacet("wst.jsdt.web");
+          if (!facetedProject.isFixedProjectFacet(jsdtFacet)) {
+            schedule(100 /* ms */);
+            return Status.OK_STATUS;
+          }
+        } catch (IllegalArgumentException ex) {
+          // JSDT facet doesn't exist. (Should not really happen.) Ignore and fall through.
         }
 
         try {
