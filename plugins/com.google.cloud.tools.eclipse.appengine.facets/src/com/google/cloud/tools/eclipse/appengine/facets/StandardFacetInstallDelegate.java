@@ -49,7 +49,7 @@ public class StandardFacetInstallDelegate extends AppEngineFacetInstallDelegate 
 
   private void installAppEngineRuntimes(final IProject project) throws CoreException {
     // https://github.com/GoogleCloudPlatform/google-cloud-eclipse/issues/1155
-    final FutureJobSuspender jobSuspender = new FutureJobSuspender();
+    final FutureNonSystemJobSuspender jobSuspender = new FutureNonSystemJobSuspender();
     final IFacetedProject facetedProject = ProjectFacetsManager.create(project);
 
     // Modifying targeted runtimes while installing/uninstalling facets is not allowed,

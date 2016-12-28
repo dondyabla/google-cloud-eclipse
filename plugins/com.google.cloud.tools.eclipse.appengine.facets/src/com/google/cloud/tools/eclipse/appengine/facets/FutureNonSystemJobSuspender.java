@@ -24,24 +24,38 @@ import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
 
 /**
- * For https://github.com/GoogleCloudPlatform/google-cloud-eclipse/issues/1155. The purpose of the
- * class is to prevent the second ConvertJob from running. The second ConvertJob is triggered by
- * the first ConvertJob when the latter job installs the JSDT facet.
+ * Prevents scheduling all future non-system jobs once {@link #suspendFutureJobs} is called, until
+ * {@link #resume} is called. Jobs already scheduled are not affected and will run to completion.
+ *
+ * The class is for https://github.com/GoogleCloudPlatform/google-cloud-eclipse/issues/1155. The
+ * purpose of the class is to prevent the second ConvertJob from running. The second ConvertJob is
+ * triggered by the first ConvertJob when the latter job installs the JSDT facet.
  *
  * Not recommended to use for other situations, although the workings of the class is general.
  */
-public class FutureJobSuspender {
+public class FutureNonSystemJobSuspender {
   private static boolean suspended;
 
+  private class SuspendedJob {
+    private Job job;
+    private long scheduleDelay;
+
+    private SuspendedJob(Job job, long scheduleDelay) {
+      this.job = job;
+      this.scheduleDelay = scheduleDelay;
+    }
+  }
+
   private List<Job> exceptionalJobs = new ArrayList<>();
-  private List<Job> sleepingJobs = new ArrayList<>();
+  private List<SuspendedJob> suspendedJobs = new ArrayList<>();
 
   private JobChangeAdaptor jobChangeListener = new JobChangeAdaptor() {
     @Override
     public void scheduled(IJobChangeEvent event) {
-      if (!exceptionalJobs.contains(event.getJob())) {
-        event.getJob().sleep();  // This will always succeed since the job is not running yet.
-        sleepingJobs.add(event.getJob());
+      Job job = event.getJob();
+      if (!job.isSystem() && !exceptionalJobs.contains(job)) {
+        job.cancel();  // This will always succeed since the job is not running yet.
+        suspendedJobs.add(new SuspendedJob(job, event.getDelay()));
       }
     }
   };
@@ -63,10 +77,10 @@ public class FutureJobSuspender {
     suspended = false;
     Job.getJobManager().removeJobChangeListener(jobChangeListener);
 
-    for (Job job : sleepingJobs) {
-      job.wakeUp();
+    for (SuspendedJob jobInfo : suspendedJobs) {
+      jobInfo.job.schedule(jobInfo.scheduleDelay);
     }
-    sleepingJobs.clear();
+    suspendedJobs.clear();
     exceptionalJobs.clear();
   }
 
