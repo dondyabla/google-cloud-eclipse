@@ -61,9 +61,13 @@ public class StandardFacetInstallDelegate extends AppEngineFacetInstallDelegate 
         // Wait until the first ConvertJob installs the JSDT facet.
         try {
           IProjectFacet jsdtFacet = ProjectFacetsManager.getProjectFacet("wst.jsdt.web");
-          if (!facetedProject.isFixedProjectFacet(jsdtFacet)) {
-            schedule(100 /* ms */);
-            return Status.OK_STATUS;
+          for (int times = 0;
+              times < 100 && !facetedProject.isFixedProjectFacet(jsdtFacet);
+              times++) {
+            try {
+              // To prevent going into the SLEEPING state, don't use "Job.schedule(100)".
+              Thread.sleep(100 /* ms */);
+            } catch (InterruptedException ex) {}
           }
         } catch (IllegalArgumentException ex) {
           // JSDT facet doesn't exist. (Should not really happen.) Ignore and fall through.
@@ -85,8 +89,9 @@ public class StandardFacetInstallDelegate extends AppEngineFacetInstallDelegate 
     // The first ConvertJob has already been scheduled (which installs JSDT facet), and
     // this is to suspend the second ConvertJob temporarily.
     jobSuspender.suspendFutureJobs();
-    // The first ConvertJob is scheduled to run after 1 second, so no need to hurry.
-    installJob.schedule(800 /* ms */);
+    // Schedule immediately so that it doesn't go into the SLEEPING state. Ensuring the job is
+    // active is necessary for unit testing.
+    installJob.schedule();
   }
 
   /**
