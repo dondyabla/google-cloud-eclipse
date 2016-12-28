@@ -51,22 +51,13 @@ public class FutureNonSystemJobSuspender {
   private static List<SuspendedJob> suspendedJobs =
       Collections.synchronizedList(new ArrayList<SuspendedJob>());
 
-  private static JobChangeAdaptor jobChangeListener = new JobChangeAdaptor() {
-    @Override
-    public void scheduled(IJobChangeEvent event) {
-      Job job = event.getJob();
-      if (!job.isSystem()) {
-        job.cancel();  // This will always succeed since the job is not running yet.
-        suspendedJobs.add(new SuspendedJob(job, event.getDelay()));
-      }
-    }
-  };
+  private static JobScheduleListener jobScheduleListener = new JobScheduleListener();
 
   /** Once called, it is imperative to call {@link resume()} later. */
   public static synchronized void suspendFutureJobs() {
     Preconditions.checkArgument(!suspended, "Already suspended.");
     suspended = true;
-    Job.getJobManager().addJobChangeListener(jobChangeListener);
+    Job.getJobManager().addJobChangeListener(jobScheduleListener);
   }
 
   public static synchronized void resume() {
@@ -77,7 +68,7 @@ public class FutureNonSystemJobSuspender {
   @VisibleForTesting
   static synchronized void resumeInternal() {
     suspended = false;
-    Job.getJobManager().removeJobChangeListener(jobChangeListener);
+    Job.getJobManager().removeJobChangeListener(jobScheduleListener);
 
     for (SuspendedJob jobInfo : suspendedJobs) {
       jobInfo.job.schedule(jobInfo.scheduleDelay);
@@ -87,8 +78,17 @@ public class FutureNonSystemJobSuspender {
 
   private FutureNonSystemJobSuspender() {}
 
-  /** Empty implementation of {@link IJobChangeListener} for convenience. */
-  private static class JobChangeAdaptor implements IJobChangeListener {
+  /** Listens for every job being scheduled and cancel it. */
+  private static class JobScheduleListener implements IJobChangeListener {
+    @Override
+    public void scheduled(IJobChangeEvent event) {
+      Job job = event.getJob();
+      if (!job.isSystem()) {
+        job.cancel();  // This will always succeed since the job is not running yet.
+        suspendedJobs.add(new SuspendedJob(job, event.getDelay()));
+      }
+    }
+
     @Override
     public void aboutToRun(IJobChangeEvent event) {}
 
@@ -100,9 +100,6 @@ public class FutureNonSystemJobSuspender {
 
     @Override
     public void running(IJobChangeEvent event) {}
-
-    @Override
-    public void scheduled(IJobChangeEvent event) {}
 
     @Override
     public void sleeping(IJobChangeEvent event) {}
