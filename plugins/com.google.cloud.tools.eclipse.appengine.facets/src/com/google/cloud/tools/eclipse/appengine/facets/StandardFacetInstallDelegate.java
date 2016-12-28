@@ -55,8 +55,8 @@ public class StandardFacetInstallDelegate extends AppEngineFacetInstallDelegate 
 
     // Modifying targeted runtimes while installing/uninstalling facets is not allowed,
     // so schedule a job as a workaround.
-    Job installJob = new AppEngineRuntimeInstallJob(facetedProject,
-        "Install App Engine runtimes in " + project.getName());
+    Job installJob = new AppEngineRuntimeInstallJob(
+        "Install App Engine runtimes in " + project.getName(), facetedProject);
     // Schedule immediately so that it doesn't go into the SLEEPING state. Ensuring the job is
     // active is necessary for unit testing.
     installJob.schedule();
@@ -70,7 +70,7 @@ public class StandardFacetInstallDelegate extends AppEngineFacetInstallDelegate 
 
     private IFacetedProject facetedProject;
 
-    private AppEngineRuntimeInstallJob(IFacetedProject facetedProject, String name) {
+    private AppEngineRuntimeInstallJob(String name, IFacetedProject facetedProject) {
       super(name);
       this.facetedProject = facetedProject;
     }
