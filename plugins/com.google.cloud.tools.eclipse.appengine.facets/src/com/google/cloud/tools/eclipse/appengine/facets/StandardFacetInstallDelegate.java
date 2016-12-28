@@ -48,8 +48,6 @@ public class StandardFacetInstallDelegate extends AppEngineFacetInstallDelegate 
   }
 
   private void installAppEngineRuntimes(final IProject project) throws CoreException {
-    // https://github.com/GoogleCloudPlatform/google-cloud-eclipse/issues/1155
-    final FutureNonSystemJobSuspender jobSuspender = new FutureNonSystemJobSuspender();
     final IFacetedProject facetedProject = ProjectFacetsManager.create(project);
 
     // Modifying targeted runtimes while installing/uninstalling facets is not allowed,
@@ -78,9 +76,10 @@ public class StandardFacetInstallDelegate extends AppEngineFacetInstallDelegate 
           return Status.OK_STATUS;
         } catch (CoreException ex) {
           return ex.getStatus();
-        } finally {
+        }
+        finally {
           // Now resume all the suspended jobs (including the second ConvertJob).
-          jobSuspender.resume();
+          FutureNonSystemJobSuspender.resume();
         }
       }
     };
@@ -90,7 +89,7 @@ public class StandardFacetInstallDelegate extends AppEngineFacetInstallDelegate 
     // https://github.com/GoogleCloudPlatform/google-cloud-eclipse/issues/1155
     // The first ConvertJob has already been scheduled (which installs JSDT facet), and
     // this is to suspend the second ConvertJob temporarily.
-    jobSuspender.suspendFutureJobs();
+    FutureNonSystemJobSuspender.suspendFutureJobs();
   }
 
   /**

@@ -18,6 +18,7 @@ package com.google.cloud.tools.eclipse.appengine.facets;
 
 import com.google.common.base.Preconditions;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.IJobChangeListener;
@@ -46,9 +47,10 @@ public class FutureNonSystemJobSuspender {
     }
   }
 
-  private List<SuspendedJob> suspendedJobs = new ArrayList<>();
+  private static List<SuspendedJob> suspendedJobs =
+      Collections.synchronizedList(new ArrayList<SuspendedJob>());
 
-  private JobChangeAdaptor jobChangeListener = new JobChangeAdaptor() {
+  private static JobChangeAdaptor jobChangeListener = new JobChangeAdaptor() {
     @Override
     public void scheduled(IJobChangeEvent event) {
       Job job = event.getJob();
@@ -60,13 +62,13 @@ public class FutureNonSystemJobSuspender {
   };
 
   /** Once called, it is imperative to call {@link resume()} later. */
-  public synchronized void suspendFutureJobs() {
+  public static synchronized void suspendFutureJobs() {
     Preconditions.checkArgument(!suspended, "Already suspended.");
     suspended = true;
     Job.getJobManager().addJobChangeListener(jobChangeListener);
   }
 
-  public synchronized void resume() {
+  public static synchronized void resume() {
     Preconditions.checkArgument(suspended, "Not suspended.");
     suspended = false;
     Job.getJobManager().removeJobChangeListener(jobChangeListener);
@@ -76,6 +78,8 @@ public class FutureNonSystemJobSuspender {
     }
     suspendedJobs.clear();
   }
+
+  private FutureNonSystemJobSuspender() {}
 
   /** Empty implementation of {@link IJobChangeListener} for convenience. */
   private static class JobChangeAdaptor implements IJobChangeListener {
