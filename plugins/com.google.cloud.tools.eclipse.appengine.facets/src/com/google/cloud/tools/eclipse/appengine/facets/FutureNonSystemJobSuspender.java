@@ -66,6 +66,7 @@ public class FutureNonSystemJobSuspender {
     exceptionalJobs.add(exception);
   }
 
+  /** Once called, it is imperative to call {@link resume()} later. */
   public synchronized void suspendFutureJobs() {
     Preconditions.checkArgument(!suspended, "Already suspended.");
     suspended = true;
