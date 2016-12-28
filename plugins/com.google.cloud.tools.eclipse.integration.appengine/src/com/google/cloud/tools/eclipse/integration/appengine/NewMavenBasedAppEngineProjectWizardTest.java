@@ -87,8 +87,8 @@ public class NewMavenBasedAppEngineProjectWizardTest extends AbstractProjectTest
       String packageName, String archetypeDescription, String[] projectFiles)
       throws CoreException, IOException {
     assertFalse(projectExists(artifactId));
-    
-    project = SwtBotAppEngineActions.createMavenWebAppProject(bot, location, 
+
+    project = SwtBotAppEngineActions.createMavenWebAppProject(bot, location,
         "com.google.groupId", artifactId, packageName, archetypeDescription);
     assertTrue(project.exists());
     if (location != null) {
@@ -105,6 +105,7 @@ public class NewMavenBasedAppEngineProjectWizardTest extends AbstractProjectTest
       Path projectFilePath = new Path(projectFile);
       assertTrue(project.exists(projectFilePath));
     }
+    ProjectUtils.waitUntilIdle();  // App Engine runtime is added via a Job, so wait.
     ProjectUtils.failIfBuildErrors("New Maven project has errors", project);
   }
 }

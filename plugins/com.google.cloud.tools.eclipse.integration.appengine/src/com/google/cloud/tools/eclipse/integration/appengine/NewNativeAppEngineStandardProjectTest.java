@@ -70,6 +70,7 @@ public class NewNativeAppEngineStandardProjectTest extends AbstractProjectTests 
       Path projectFilePath = new Path(projectFile);
       assertTrue(project.exists(projectFilePath));
     }
+    ProjectUtils.waitUntilIdle();  // App Engine runtime is added via a Job, so wait.
     ProjectUtils.failIfBuildErrors("New native project has errors", project);
   }
 }
