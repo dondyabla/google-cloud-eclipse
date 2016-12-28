@@ -33,14 +33,14 @@ import org.eclipse.core.runtime.jobs.Job;
  * purpose of the class is to prevent the second ConvertJob from running. The second ConvertJob is
  * triggered by the first ConvertJob when the latter job installs the JSDT facet.
  *
- * Not recommended to use for other situations, although the workings of the class is general.
+ * Not recommended to use for other situations, although the workings of the class are general.
  */
 public class FutureNonSystemJobSuspender {
   private static boolean suspended;
 
   private static class SuspendedJob {
     private Job job;
-    private long scheduleDelay;
+    private long scheduleDelay;  // ms
 
     private SuspendedJob(Job job, long scheduleDelay) {
       this.job = job;

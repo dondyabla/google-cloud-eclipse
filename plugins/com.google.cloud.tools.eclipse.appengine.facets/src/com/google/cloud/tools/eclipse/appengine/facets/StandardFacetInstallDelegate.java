@@ -51,7 +51,7 @@ public class StandardFacetInstallDelegate extends AppEngineFacetInstallDelegate 
   }
 
   private void installAppEngineRuntimes(final IProject project) throws CoreException {
-    final IFacetedProject facetedProject = ProjectFacetsManager.create(project);
+    IFacetedProject facetedProject = ProjectFacetsManager.create(project);
 
     // Modifying targeted runtimes while installing/uninstalling facets is not allowed,
     // so schedule a job as a workaround.

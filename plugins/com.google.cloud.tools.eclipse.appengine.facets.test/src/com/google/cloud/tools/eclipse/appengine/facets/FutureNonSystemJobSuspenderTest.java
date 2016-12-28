@@ -45,7 +45,7 @@ public class FutureNonSystemJobSuspenderTest {
     try {
       FutureNonSystemJobSuspender.suspendFutureJobs();
       fail();
-    } catch (IllegalArgumentException ex) {}
+    } catch (IllegalArgumentException expected) {}
   }
 
   @Test(expected = IllegalArgumentException.class)

@@ -123,8 +123,8 @@ public class AppEngineStandardFacet {
 
     // https://github.com/GoogleCloudPlatform/google-cloud-eclipse/issues/1155
     // Instead of using "IFacetedProject.installProjectFacet()", we install facets in a batch
-    // using "IFacetedProject.modify()" so that we keeping holding a lock until we finish
-    // installing all the facets. This makes the first ConvertJob install the JSDT facet only
+    // using "IFacetedProject.modify()" so that we keep holding a lock until we finish installing
+    // all the facets. This ensures that the first ConvertJob starts installing the JSDT facet only
     // after the batch is complete, which in turn prevents the first ConvertJob from scheduling
     // the second ConvertJob (triggered by installing the JSDT facet.)
     Set<IFacetedProject.Action> facetInstallBatchQueue = new HashSet<>();
