@@ -236,13 +236,13 @@ public class LocalAppEngineServerBehaviour extends ServerBehaviourDelegate
   /**
    * Starts the development server.
    *
-   * @param runnables the path to directories that contain configuration files like appengine-web.xml
+   * @param runnables the path to directories that contain configuration files such as
+   *        appengine-web.xml
    * @param console the stream (Eclipse console) to send development server process output to
    * @param arguments JVM arguments to pass to the dev server
    */
   void startDevServer(List<File> runnables, MessageConsoleStream console, List<String> arguments)
       throws CoreException {
-    //todo pass along arguments
     
     checkAndSetPorts();  // Must be called before setting the STARTING state.
     setServerState(IServer.STATE_STARTING);
@@ -257,6 +257,7 @@ public class LocalAppEngineServerBehaviour extends ServerBehaviourDelegate
     devServerRunConfiguration.setHost(getServer().getHost());
     devServerRunConfiguration.setPort(serverPort);
     devServerRunConfiguration.setAdminPort(adminPort);
+    devServerRunConfiguration.setJvmFlags(arguments);
 
     // Run server
     try {
@@ -284,9 +285,6 @@ public class LocalAppEngineServerBehaviour extends ServerBehaviourDelegate
 
     // Create dev app server instance
     initializeDevServer(console);
-
-    //todo pass along arguments
-
     
     // Create run configuration
     DefaultRunConfiguration devServerRunConfiguration = new DefaultRunConfiguration();
@@ -308,6 +306,7 @@ public class LocalAppEngineServerBehaviour extends ServerBehaviourDelegate
     }
     jvmFlags.add("-Xdebug"); //$NON-NLS-1$
     jvmFlags.add("-Xrunjdwp:transport=dt_socket,server=n,suspend=y,quiet=y,address=" + debugPort); //$NON-NLS-1$
+    jvmFlags.addAll(arguments);
     devServerRunConfiguration.setJvmFlags(jvmFlags);
 
     // Run server

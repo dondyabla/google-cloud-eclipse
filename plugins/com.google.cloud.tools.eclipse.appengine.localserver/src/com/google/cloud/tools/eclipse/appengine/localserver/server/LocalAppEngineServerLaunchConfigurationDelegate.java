@@ -31,6 +31,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -81,10 +82,10 @@ public class LocalAppEngineServerLaunchConfigurationDelegate
       CloudSdk cloudSdk = new CloudSdk.Builder().build();
       cloudSdk.validateCloudSdk();
     } catch (CloudSdkOutOfDateException ex) {
-        String detailMessage = Messages.getString("cloudsdk.out.of.date");
-        Status status = new Status(IStatus.ERROR,
-            "com.google.cloud.tools.eclipse.appengine.deploy.ui", detailMessage);
-        throw new CoreException(status);
+      String detailMessage = Messages.getString("cloudsdk.out.of.date");
+      Status status = new Status(IStatus.ERROR,
+          "com.google.cloud.tools.eclipse.appengine.deploy.ui", detailMessage);
+      throw new CoreException(status);
     } catch (AppEngineException ex) {
       String detailMessage = Messages.getString("cloudsdk.not.configured"); //$NON-NLS-1$
       Status status = new Status(IStatus.ERROR,
@@ -139,11 +140,13 @@ public class LocalAppEngineServerLaunchConfigurationDelegate
     String vmArgumentString = getVMArguments(configuration);
     // these strings are exactly as supplied by the user in the dialog box
     
-    List<String> arguments = null;
+    List<String> arguments = new ArrayList<>();
+    arguments.addAll(Arrays.asList(programArguments.split("\\s+")));
+    arguments.addAll(Arrays.asList(vmArgumentString.split("\\s+")));
     if (ILaunchManager.DEBUG_MODE.equals(mode)) {
       int debugPort = getDebugPort();
       setupDebugTarget(launch, debugPort, monitor);
-      serverBehaviour.startDebugDevServer(runnables, console.newMessageStream(), debugPort, arguments );
+      serverBehaviour.startDebugDevServer(runnables, console.newMessageStream(), debugPort, arguments);
     } else {
       // A launch must have at least one debug target or process, or it otherwise becomes a zombie
       LocalAppEngineServerDebugTarget.addTarget(launch, serverBehaviour);
