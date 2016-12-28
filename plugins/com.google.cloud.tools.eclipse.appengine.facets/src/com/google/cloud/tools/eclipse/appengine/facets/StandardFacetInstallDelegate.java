@@ -70,7 +70,7 @@ public class StandardFacetInstallDelegate extends AppEngineFacetInstallDelegate 
             } catch (InterruptedException ex) {}
           }
         } catch (IllegalArgumentException ex) {
-          // JSDT facet doesn't exist. (Should not really happen.) Ignore and fall through.
+          // JSDT facet itself doesn't exist. (Should not really happen.) Ignore and fall through.
         }
 
         try {
@@ -84,14 +84,13 @@ public class StandardFacetInstallDelegate extends AppEngineFacetInstallDelegate 
         }
       }
     };
-    jobSuspender.addExceptionalJob(installJob);
+    // Schedule immediately so that it doesn't go into the SLEEPING state. Ensuring the job is
+    // active is necessary for unit testing.
+    installJob.schedule();
     // https://github.com/GoogleCloudPlatform/google-cloud-eclipse/issues/1155
     // The first ConvertJob has already been scheduled (which installs JSDT facet), and
     // this is to suspend the second ConvertJob temporarily.
     jobSuspender.suspendFutureJobs();
-    // Schedule immediately so that it doesn't go into the SLEEPING state. Ensuring the job is
-    // active is necessary for unit testing.
-    installJob.schedule();
   }
 
   /**

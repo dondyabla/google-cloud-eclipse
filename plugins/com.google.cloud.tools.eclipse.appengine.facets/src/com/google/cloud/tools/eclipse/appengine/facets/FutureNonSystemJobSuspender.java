@@ -36,7 +36,7 @@ import org.eclipse.core.runtime.jobs.Job;
 public class FutureNonSystemJobSuspender {
   private static boolean suspended;
 
-  private class SuspendedJob {
+  private static class SuspendedJob {
     private Job job;
     private long scheduleDelay;
 
@@ -46,25 +46,18 @@ public class FutureNonSystemJobSuspender {
     }
   }
 
-  private List<Job> exceptionalJobs = new ArrayList<>();
   private List<SuspendedJob> suspendedJobs = new ArrayList<>();
 
   private JobChangeAdaptor jobChangeListener = new JobChangeAdaptor() {
     @Override
     public void scheduled(IJobChangeEvent event) {
       Job job = event.getJob();
-      if (!job.isSystem() && !exceptionalJobs.contains(job)) {
+      if (!job.isSystem()) {
         job.cancel();  // This will always succeed since the job is not running yet.
         suspendedJobs.add(new SuspendedJob(job, event.getDelay()));
       }
     }
   };
-
-  /** @param exceptionalJob job that will not be suspended */
-  public synchronized void addExceptionalJob(Job exception) {
-    Preconditions.checkArgument(!suspended);
-    exceptionalJobs.add(exception);
-  }
 
   /** Once called, it is imperative to call {@link resume()} later. */
   public synchronized void suspendFutureJobs() {
@@ -82,11 +75,10 @@ public class FutureNonSystemJobSuspender {
       jobInfo.job.schedule(jobInfo.scheduleDelay);
     }
     suspendedJobs.clear();
-    exceptionalJobs.clear();
   }
 
   /** Empty implementation of {@link IJobChangeListener} for convenience. */
-  private class JobChangeAdaptor implements IJobChangeListener {
+  private static class JobChangeAdaptor implements IJobChangeListener {
     @Override
     public void aboutToRun(IJobChangeEvent event) {}
 
