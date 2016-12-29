@@ -18,7 +18,6 @@ package com.google.cloud.tools.eclipse.appengine.facets;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -39,16 +38,13 @@ public class FutureNonSystemJobSuspenderTest {
     job2.cancel();
   }
 
-  @Test
+  @Test(expected = IllegalStateException.class)
   public void testCannotSuspendConcurrently() {
     FutureNonSystemJobSuspender.suspendFutureJobs();
-    try {
-      FutureNonSystemJobSuspender.suspendFutureJobs();
-      fail();
-    } catch (IllegalArgumentException expected) {}
+    FutureNonSystemJobSuspender.suspendFutureJobs();
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = IllegalStateException.class)
   public void testCannotResumeIfNotSuspended() {
     FutureNonSystemJobSuspender.resume();
   }

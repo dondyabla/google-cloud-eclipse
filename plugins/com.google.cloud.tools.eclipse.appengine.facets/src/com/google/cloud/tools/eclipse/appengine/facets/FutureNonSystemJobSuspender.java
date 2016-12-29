@@ -55,13 +55,13 @@ public class FutureNonSystemJobSuspender {
 
   /** Once called, it is imperative to call {@link resume()} later. */
   public static synchronized void suspendFutureJobs() {
-    Preconditions.checkArgument(!suspended, "Already suspended.");
+    Preconditions.checkState(!suspended, "Already suspended.");
     suspended = true;
     Job.getJobManager().addJobChangeListener(jobScheduleListener);
   }
 
   public static synchronized void resume() {
-    Preconditions.checkArgument(suspended, "Not suspended.");
+    Preconditions.checkState(suspended, "Not suspended.");
     resumeInternal();
   }
 
@@ -78,7 +78,7 @@ public class FutureNonSystemJobSuspender {
 
   private FutureNonSystemJobSuspender() {}
 
-  /** Listens for every job being scheduled and cancel it. */
+  /** Listens for every job being scheduled and cancels it. */
   private static class JobScheduleListener implements IJobChangeListener {
     @Override
     public void scheduled(IJobChangeEvent event) {
